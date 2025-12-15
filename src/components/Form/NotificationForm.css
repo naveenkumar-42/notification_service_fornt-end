@@ -1,85 +1,80 @@
 .notification-form {
-  padding: 30px;
-  animation: slideInLeft 0.6s ease 0.2s backwards;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .notification-form h2 {
-  margin-bottom: 25px;
+  color: #333;
+  margin-bottom: 24px;
   font-size: 1.5rem;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+}
+
+.notification-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .form-group {
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 }
 
 .form-group label {
-  margin-bottom: 8px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #555;
+  margin-bottom: 8px;
   font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-.form-input {
+.form-group input,
+.form-group select,
+.form-group textarea {
   padding: 12px 16px;
-  background: var(--card);
-  border: 2px solid var(--border-light);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s;
   font-family: inherit;
-  transition: all 0.3s ease;
 }
 
-.form-input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  background: var(--card);
-  box-shadow: 0 0 20px rgba(0, 250, 154, 0.2);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-input.textarea {
-  resize: vertical;
-  min-height: 100px;
-  font-family: 'Courier New', monospace;
-}
-
-.form-input.error {
-  border-color: #ff5757;
-  box-shadow: 0 0 10px rgba(255, 87, 87, 0.2);
-}
-
-.error-text {
-  color: #ff5757;
-  font-size: 0.85rem;
-  margin-top: 5px;
-}
-
-.btn-submit {
-  margin-top: 10px;
-  width: 100%;
-  padding: 14px 20px;
+.submit-btn {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
   font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
 }
 
-.btn-submit:disabled {
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .notification-form {
-    padding: 20px;
-  }
-
-  .notification-form h2 {
-    font-size: 1.3rem;
-  }
 }
