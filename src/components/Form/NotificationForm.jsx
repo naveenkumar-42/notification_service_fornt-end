@@ -8,7 +8,25 @@ const NotificationForm = ({ onSubmit, loading }) => {
     message: '',
   });
 
-  const notificationTypes = ['USER_SIGNUP', 'ORDER_CONFIRMATION', 'PROMOTIONAL', 'ALERT'];
+  const notificationTypes = [
+    'USER_SIGNUP',
+    'EMAIL',
+    'SMS',
+    'PUSH',
+    'ALERT',
+    'DELIVERY_DELAYED',
+    'DELIVERY_OUT_FOR',
+    'LOW_BALANCE_ALERT',
+    'ORDER_CONFIRMATION',
+    'ORDER_SHIPPED',
+    'OTP_VERIFICATION',
+    'PASSWORD_RESET',
+    'PAYMENT_FAILED',
+    'PAYMENT_SUCCESS',
+    'PROMOTIONAL',
+    'PROMO_OFFER',
+    'SYSTEM_ALERT',
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,7 +71,7 @@ const NotificationForm = ({ onSubmit, loading }) => {
           <label htmlFor="recipient">Recipient Email</label>
           <input
             id="recipient"
-            type="email"
+            type="text"
             name="recipient"
             value={formData.recipient}
             onChange={handleChange}
