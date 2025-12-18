@@ -102,6 +102,13 @@ function History() {
       filtered = filtered.filter(n => new Date(n.createdAt) >= startDate);
     }
 
+    // Sort by createdAt in descending order (newest first)
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB - dateA; // Descending order (newest first)
+    });
+
     setFilteredNotifications(filtered);
   };
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader, Mail, MessageSquare, Bell, Smartphone, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import './NotificationTable.css';
 
 function NotificationTable({ 
@@ -27,6 +27,42 @@ function NotificationTable({
       case 'LOW': return 'success';
       default: return 'info';
     }
+  };
+
+  const getChannelIcon = (channel) => {
+    switch(channel) {
+      case 'EMAIL': return <Mail size={14} />;
+      case 'SMS': return <MessageSquare size={14} />;
+      case 'PUSH': return <Bell size={14} />;
+      case 'IN_APP': return <Smartphone size={14} />;
+      default: return <Mail size={14} />;
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'SENT': return <CheckCircle2 size={14} />;
+      case 'FAILED': return <XCircle size={14} />;
+      case 'PENDING': return <Clock size={14} />;
+      default: return <AlertCircle size={14} />;
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+    });
   };
 
   if (loading) {
@@ -64,30 +100,38 @@ function NotificationTable({
         </thead>
         <tbody>
           {notifications.map((notif) => (
-            <tr key={notif.id}>
+            <tr key={notif.id} className="table-row">
               <td className="cell-id">#{notif.id}</td>
-              <td>{notif.notificationType || '-'}</td>
+              <td className="cell-type">
+                <span className="type-badge">{notif.notificationType || '-'}</span>
+              </td>
               <td>
-                <span className="badge badge-primary">
-                  {notif.channel || '-'}
+                <span className="badge badge-primary channel-badge">
+                  {getChannelIcon(notif.channel)}
+                  <span>{notif.channel || '-'}</span>
                 </span>
               </td>
               <td>
-                <span className={`priority-${notif.priority?.toLowerCase() || 'low'}`}>
+                <span className={`priority-badge priority-${notif.priority?.toLowerCase() || 'low'}`}>
                   {notif.priority || '-'}
                 </span>
               </td>
-              <td className="cell-recipient">{notif.recipient}</td>
+              <td className="cell-recipient">{notif.recipient || '-'}</td>
               <td>
-                <span className={`badge badge-${getStatusColor(notif.status)}`}>
-                  {notif.status}
+                <span className={`badge badge-${getStatusColor(notif.status)} status-badge`}>
+                  {getStatusIcon(notif.status)}
+                  <span>{notif.status}</span>
                 </span>
               </td>
               <td className="cell-center">
                 <span className="retry-badge">{notif.retryCount || 0}</span>
               </td>
               <td className="cell-date">
-                {new Date(notif.createdAt).toLocaleString()}
+                <div className="date-cell">
+                  <Clock size={12} />
+                  <span className="date-relative">{formatDate(notif.createdAt)}</span>
+                  <span className="date-full">{new Date(notif.createdAt).toLocaleString()}</span>
+                </div>
               </td>
             </tr>
           ))}

@@ -5,11 +5,14 @@ import './QuickSendForm.css';
 
 function QuickSendForm({ onSubmit }) {
   const [formData, setFormData] = useState({
+    notificationType: 'ALERT',
     recipient: '',
     message: '',
-    channel: 'EMAIL'
+    channel: 'EMAIL',
+    priority: 'MEDIUM'
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,22 +20,47 @@ function QuickSendForm({ onSubmit }) {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.recipient || !formData.message) return;
+    setError(null);
+    
+    if (!formData.recipient || !formData.message) {
+      setError('Please fill in all required fields');
+      return;
+    }
     
     setLoading(true);
-    await onSubmit(formData);
-    setLoading(false);
-    setFormData({ recipient: '', message: '', channel: 'EMAIL' });
+    try {
+      await onSubmit(formData);
+      // Reset form only on success
+      setFormData({ 
+        notificationType: 'ALERT',
+        recipient: '', 
+        message: '', 
+        channel: 'EMAIL',
+        priority: 'MEDIUM'
+      });
+    } catch (err) {
+      setError(err.message || 'Failed to send notification');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="quick-form">
+      {error && (
+        <div className="alert alert-error" style={{ marginBottom: '16px', padding: '12px' }}>
+          {error}
+        </div>
+      )}
+
       <div className="form-group">
-        <label htmlFor="recipient">Recipient</label>
+        <label htmlFor="recipient">Recipient *</label>
         <input
           type="text"
           id="recipient"
@@ -46,13 +74,14 @@ function QuickSendForm({ onSubmit }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="channel">Channel</label>
+        <label htmlFor="channel">Channel *</label>
         <select
           id="channel"
           name="channel"
           value={formData.channel}
           onChange={handleChange}
           className="form-control"
+          required
         >
           <option value="EMAIL">Email</option>
           <option value="SMS">SMS</option>
@@ -62,7 +91,24 @@ function QuickSendForm({ onSubmit }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="message">Message</label>
+        <label htmlFor="priority">Priority *</label>
+        <select
+          id="priority"
+          name="priority"
+          value={formData.priority}
+          onChange={handleChange}
+          className="form-control"
+          required
+        >
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+          <option value="URGENT">Urgent</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="message">Message *</label>
         <textarea
           id="message"
           name="message"

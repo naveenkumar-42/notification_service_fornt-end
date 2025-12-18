@@ -36,7 +36,14 @@ function Dashboard() {
         failed: notifications.filter(n => n.status === 'FAILED').length
       });
       
-      setRecentNotifications(notifications.slice(0, 5));
+      // Sort by createdAt in descending order (newest first) and take first 5
+      const sortedNotifications = [...notifications].sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB - dateA; // Descending order (newest first)
+      });
+      
+      setRecentNotifications(sortedNotifications.slice(0, 5));
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
@@ -48,16 +55,30 @@ function Dashboard() {
 
   const handleQuickSend = async (formData) => {
     try {
-      const response = await notificationAPI.sendNotification(formData);
+      // Ensure all required fields are present
+      const notificationData = {
+        notificationType: formData.notificationType || 'ALERT',
+        recipient: formData.recipient,
+        channel: formData.channel || 'EMAIL',
+        priority: formData.priority || 'MEDIUM',
+        message: formData.message,
+        subject: formData.subject || '',
+        scheduledTime: formData.scheduledTime || ''
+      };
+
+      const response = await notificationAPI.sendNotification(notificationData);
       setAlert({ 
         type: 'success', 
         message: `Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}` 
       });
-      fetchDashboardData();
+      // Refresh dashboard data to show the new notification
+      await fetchDashboardData();
       setTimeout(() => setAlert(null), 3000);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to send notification. Please try again.';
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to send notification. Please try again.';
       setAlert({ type: 'error', message: errorMessage });
+      // Re-throw error so QuickSendForm can handle it
+      throw new Error(errorMessage);
     }
   };
 
