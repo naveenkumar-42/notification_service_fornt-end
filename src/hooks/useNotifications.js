@@ -7,41 +7,38 @@ export const useNotification = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Send notification
   const sendNotification = useCallback(async (data) => {
     setLoading(true);
     setError(null);
     setSuccess(null);
     try {
       const response = await notificationAPI.sendNotification(data);
-      setSuccess(`Notification sent! Event ID: ${response.data.eventId}`);
+      setSuccess(`Notification queued! Event ID: ${response.data.eventId}`);
       return response.data;
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to send notification';
-      setError(errorMsg);
+      const msg = err.response?.data?.message || err.message || 'Failed to send notification';
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Get notification status
   const getNotificationStatus = useCallback(async (eventId) => {
     setLoading(true);
     setError(null);
     try {
       const response = await notificationAPI.getStatus(eventId);
-      return response.data;
+      return response.data; // show in modal or detail
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to fetch status';
-      setError(errorMsg);
+      const msg = err.response?.data?.message || 'Failed to fetch status';
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch notification history
   const fetchHistory = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -50,15 +47,14 @@ export const useNotification = () => {
       setNotifications(response.data);
       return response.data;
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to fetch history';
-      setError(errorMsg);
+      const msg = err.response?.data?.message || 'Failed to fetch history';
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Get notifications by status
   const fetchByStatus = useCallback(async (status) => {
     setLoading(true);
     setError(null);
@@ -67,15 +63,14 @@ export const useNotification = () => {
       setNotifications(response.data);
       return response.data;
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to fetch notifications';
-      setError(errorMsg);
+      const msg = err.response?.data?.message || 'Failed to fetch notifications';
+      setError(msg);
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Clear messages
   const clearMessages = useCallback(() => {
     setError(null);
     setSuccess(null);
