@@ -19,6 +19,16 @@
   transform: translateX(-100%);
 }
 
+@media (max-width: 768px) {
+  .sidebar {
+    z-index: 1100;
+  }
+
+  .sidebar.open {
+    box-shadow: var(--shadow-xl);
+  }
+}
+
 .sidebar-header {
   padding: var(--space-24);
   border-bottom: 1px solid var(--color-border);

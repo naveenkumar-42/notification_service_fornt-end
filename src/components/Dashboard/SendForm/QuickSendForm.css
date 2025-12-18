@@ -1,23 +1,56 @@
-/* src/components/Dashboard/SendForm/QuickSendForm.css */
 .quick-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-20);
 }
 
-.form-group {
+.quick-form .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-8);
 }
 
-.form-group label {
-  font-size: 14px;
-  font-weight: 600;
+.quick-form .form-group label {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
 }
 
-.form-control {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+.quick-form .form-control {
+  padding: var(--space-10) var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+  line-height: var(--line-height-normal);
+}
+
+.quick-form .form-control:focus {
+  outline: var(--focus-outline);
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+.quick-form .form-control::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.quick-form textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+  font-family: var(--font-family-base);
+}
+
+.quick-form .btn {
+  margin-top: var(--space-8);
+}
+
+@media (max-width: 480px) {
+  .quick-form {
+    gap: var(--space-16);
+  }
 }

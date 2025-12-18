@@ -1,13 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { BarChart, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { notificationAPI } from '../utils/api';
 import StatsCard from '../components/Cards/StatsCard';
 import RecentNotifications from '../components/Dashboard/RecentNotifications';
 import QuickSendForm from '../components/Dashboard/SendForm/QuickSendForm';
 import './Dashboard.css';
-
-const API_URL = 'http://localhost:8080/api/notifications';
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -28,8 +26,8 @@ function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/history`);
-      const notifications = response.data;
+      const response = await notificationAPI.getHistory();
+      const notifications = response.data || [];
       
       setStats({
         total: notifications.length,
@@ -42,19 +40,24 @@ function Dashboard() {
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
-      setAlert({ type: 'error', message: 'Failed to load dashboard data' });
+      const errorMessage = error.response?.data?.message || 'Failed to load dashboard data. Please check your connection.';
+      setAlert({ type: 'error', message: errorMessage });
       setLoading(false);
     }
   };
 
   const handleQuickSend = async (formData) => {
     try {
-      await axios.post(`${API_URL}/send`, formData);
-      setAlert({ type: 'success', message: 'Notification sent successfully!' });
+      const response = await notificationAPI.sendNotification(formData);
+      setAlert({ 
+        type: 'success', 
+        message: `Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}` 
+      });
       fetchDashboardData();
       setTimeout(() => setAlert(null), 3000);
     } catch (error) {
-      setAlert({ type: 'error', message: 'Failed to send notification' });
+      const errorMessage = error.response?.data?.message || 'Failed to send notification. Please try again.';
+      setAlert({ type: 'error', message: errorMessage });
     }
   };
 

@@ -12,12 +12,32 @@ import './App.css';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  const handleMenuToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleOverlayClick = () => {
+    setIsSidebarOpen(false);
+  };
+
+  // In your index.js or App.js
+if (process.env.NODE_ENV === 'development') {
+  const originalError = console.error;
+  console.error = (...args) => {
+    if (typeof args[0] === 'string' && args[0].includes('Download the React DevTools')) {
+      return;
+    }
+    originalError(...args);
+  };
+}
+
   return (
     <Router>
       <div className="app-container">
         <Sidebar isOpen={isSidebarOpen} />
+        <div className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`} onClick={handleOverlayClick} />
         <div className={`main-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-          <Header onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+          <Header onMenuToggle={handleMenuToggle} />
           <main className="page-content">
             <Routes>
               <Route path="/" element={<Dashboard />} />

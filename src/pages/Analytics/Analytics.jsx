@@ -1,10 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { notificationAPI } from '../../utils/api';
 import './Analytics.css';
-
-const API_URL = 'http://localhost:8080/api/notifications';
 
 function Analytics() {
   const [notifications, setNotifications] = useState([]);
@@ -22,12 +20,14 @@ function Analytics() {
 
   const fetchAnalyticsData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/history`);
-      const data = response.data;
+      const response = await notificationAPI.getHistory();
+      const data = response.data || [];
       setNotifications(data);
       processAnalytics(data);
     } catch (error) {
       console.error('Failed to fetch analytics data', error);
+      setNotifications([]);
+      processAnalytics([]);
     }
   };
 

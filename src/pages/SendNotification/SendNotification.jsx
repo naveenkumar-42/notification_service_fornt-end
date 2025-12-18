@@ -1,10 +1,8 @@
 
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Send, AlertCircle, CheckCircle } from 'lucide-react';
+import { notificationAPI } from '../../utils/api';
 import './SendNotification.css';
-
-const API_URL = 'http://localhost:8080/api/notifications';
 
 function SendNotification() {
   const [formData, setFormData] = useState({
@@ -52,10 +50,10 @@ function SendNotification() {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/send`, formData);
+      const response = await notificationAPI.sendNotification(formData);
       setAlert({ 
         type: 'success', 
-        message: `✓ Notification sent! Event ID: ${response.data.eventId}` 
+        message: `✓ Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}` 
       });
       setFormData({
         notificationType: 'USER_SIGNUP',
@@ -68,9 +66,10 @@ function SendNotification() {
       });
       setTimeout(() => setAlert(null), 5000);
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to send notification. Please check your connection and try again.';
       setAlert({ 
         type: 'error', 
-        message: error.response?.data?.message || 'Failed to send notification' 
+        message: errorMessage
       });
     } finally {
       setLoading(false);

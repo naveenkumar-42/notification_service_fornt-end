@@ -1,12 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Search, Filter, Download } from 'lucide-react';
+import { notificationAPI } from '../../utils/api';
 import FilterSidebar from '../../components/History/FilterSidebar';
 import NotificationTable from '../../components/History/NotificationTable/NotificationTable';
 import './History.css';
-
-const API_URL = 'http://localhost:8080/api/notifications';
 
 function History() {
   const [notifications, setNotifications] = useState([]);
@@ -40,11 +38,12 @@ function History() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${API_URL}/history`);
-      setNotifications(response.data);
+      const response = await notificationAPI.getHistory();
+      setNotifications(response.data || []);
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch notifications', error);
+      setNotifications([]);
       setLoading(false);
     }
   };
