@@ -12,9 +12,11 @@ function FilterSidebar({ filters, onFilterChange, notificationCount }) {
 
   const priorityOptions = [
     { value: 'ALL', label: 'All Priorities' },
+    { value:'CRITICAL', label:'Critical', color:'danger'},
     { value: 'HIGH', label: 'High', color: 'danger' },
     { value: 'MEDIUM', label: 'Medium', color: 'warning' },
-    { value: 'LOW', label: 'Low', color: 'success' }
+    { value: 'LOW', label: 'Low', color: 'success' },
+
   ];
 
   const channelOptions = [

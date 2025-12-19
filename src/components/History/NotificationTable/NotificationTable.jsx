@@ -1,6 +1,10 @@
-
 import React from 'react';
-import { ChevronLeft, ChevronRight, Loader, Mail, MessageSquare, Bell, Smartphone, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { 
+  ChevronLeft, ChevronRight, Loader, 
+  Mail, MessageSquare, Bell, Smartphone, 
+  Clock, CheckCircle2, CheckCheck, XCircle, 
+  Loader2, AlertCircle 
+} from 'lucide-react';
 import './NotificationTable.css';
 
 function NotificationTable({ 
@@ -11,40 +15,26 @@ function NotificationTable({
   onPageChange,
   totalRecords 
 }) {
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'SENT': return 'success';
-      case 'FAILED': return 'danger';
-      case 'PENDING': return 'warning';
-      default: return 'info';
-    }
-  };
 
-  const getPriorityColor = (priority) => {
-    switch(priority) {
-      case 'HIGH': return 'danger';
-      case 'MEDIUM': return 'warning';
-      case 'LOW': return 'success';
-      default: return 'info';
+  const getStatusIcon = (status) => {
+    switch(status?.toUpperCase()) {
+      case 'QUEUED': return <Loader2 size={14} className="animate-spin" />;
+      case 'SENT': return <CheckCircle2 size={14} />;
+      case 'DELIVERED': return <CheckCheck size={14} />;
+      case 'PENDING': return <Clock size={14} />;
+      case 'FAILED': return <XCircle size={14} />;
+      default: return <AlertCircle size={14} />;
     }
   };
 
   const getChannelIcon = (channel) => {
-    switch(channel) {
+    switch(channel?.toUpperCase()) {
       case 'EMAIL': return <Mail size={14} />;
       case 'SMS': return <MessageSquare size={14} />;
       case 'PUSH': return <Bell size={14} />;
+      case 'INAPP': 
       case 'IN_APP': return <Smartphone size={14} />;
       default: return <Mail size={14} />;
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch(status) {
-      case 'SENT': return <CheckCircle2 size={14} />;
-      case 'FAILED': return <XCircle size={14} />;
-      case 'PENDING': return <Clock size={14} />;
-      default: return <AlertCircle size={14} />;
     }
   };
 
@@ -59,8 +49,7 @@ function NotificationTable({
     if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
     
     return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
+      month: 'short', day: 'numeric', 
       year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
     });
   };
@@ -95,7 +84,7 @@ function NotificationTable({
             <th>Recipient</th>
             <th>Status</th>
             <th>Retries</th>
-            <th>Created At</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
@@ -103,34 +92,51 @@ function NotificationTable({
             <tr key={notif.id} className="table-row">
               <td className="cell-id">#{notif.id}</td>
               <td className="cell-type">
-                <span className="type-badge">{notif.notificationType || '-'}</span>
+                <span className="type-badge">
+                  {notif.notificationType || 'GENERAL'}
+                </span>
               </td>
-              <td>
-                <span className="badge badge-primary channel-badge">
-                  {getChannelIcon(notif.channel)}
+              
+              {/* ✅ PERFECT CHANNEL BADGE */}
+              <td className="channel-cell">
+                <div className={`channel-badge channel-${notif.channel?.toLowerCase() || 'unknown'}`}>
+                  <div className="channel-icon">
+                    {getChannelIcon(notif.channel)}
+                  </div>
                   <span>{notif.channel || '-'}</span>
-                </span>
+                </div>
               </td>
-              <td>
-                <span className={`priority-badge priority-${notif.priority?.toLowerCase() || 'low'}`}>
-                  {notif.priority || '-'}
-                </span>
+              
+              {/* ✅ PERFECT PRIORITY BADGE */}
+              <td className="priority-cell">
+                <div className={`priority-badge priority-${notif.priority?.toLowerCase() || 'medium'}`}>
+                  <div className={`priority-dot priority-${notif.priority?.toLowerCase() || 'medium'}`}></div>
+                  <span>{notif.priority || 'MEDIUM'}</span>
+                </div>
               </td>
+              
               <td className="cell-recipient">{notif.recipient || '-'}</td>
-              <td>
-                <span className={`badge badge-${getStatusColor(notif.status)} status-badge`}>
-                  {getStatusIcon(notif.status)}
-                  <span>{notif.status}</span>
-                </span>
+              
+              {/* ✅ PERFECT STATUS BADGE */}
+              <td className="status-cell">
+                <div className={`status-badge status-${notif.status?.toLowerCase() || 'unknown'}`}>
+                  <div className="status-icon">
+                    {getStatusIcon(notif.status)}
+                  </div>
+                  <span>{notif.status || 'UNKNOWN'}</span>
+                </div>
               </td>
+              
               <td className="cell-center">
                 <span className="retry-badge">{notif.retryCount || 0}</span>
               </td>
+              
               <td className="cell-date">
                 <div className="date-cell">
                   <Clock size={12} />
-                  <span className="date-relative">{formatDate(notif.createdAt)}</span>
-                  <span className="date-full">{new Date(notif.createdAt).toLocaleString()}</span>
+                  <span className="date-relative" title={new Date(notif.createdAt).toLocaleString()}>
+                    {formatDate(notif.createdAt)}
+                  </span>
                 </div>
               </td>
             </tr>

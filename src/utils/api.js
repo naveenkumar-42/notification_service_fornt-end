@@ -87,6 +87,14 @@ export const notificationAPI = {
   
   // Health check endpoint
   healthCheck: () => api.get('/health'),
+
+
+  getFilteredHistory: (params) => api.get('/filter', { params }),
+
+  getByPriority: (priority) => api.get(`/priority-filter/${priority}`),
+
+  getByChannel: (channel) => api.get(`/channel-filter/${channel}`)
+
 };
 
 export default api;

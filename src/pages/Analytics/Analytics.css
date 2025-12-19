@@ -69,6 +69,44 @@
 .stat-change.negative {
   color: var(--color-error);
 }
+/* ✅ DARK CUSTOM TOOLTIP FOR ALL RECHARTS */
+.recharts-default-tooltip {
+  background: rgba(17, 24, 39, 0.95) !important;  /* Dark gray */
+  border: 1px solid rgba(75, 85, 99, 0.5) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-12) !important;
+  box-shadow: var(--shadow-xl) !important;
+  backdrop-filter: blur(10px) !important;
+  color: white !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+}
+
+/* Tooltip content styling */
+.recharts-tooltip-label {
+  color: #f8fafc !important;  /* Light text */
+  font-weight: var(--font-weight-semibold) !important;
+  margin-bottom: var(--space-8) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+  padding-bottom: var(--space-4) !important;
+}
+
+.recharts-tooltip-item {
+  color: white !important;
+  margin: var(--space-2) 0 !important;
+}
+
+/* Legend styling */
+.recharts-legend-item {
+  font-size: var(--font-size-sm) !important;
+}
+
+/* Custom cursor */
+.recharts-wrapper .recharts-cursor {
+  stroke-dasharray: 3 3 !important;
+  stroke: rgba(99, 102, 241, 0.3) !important;
+}
+
 
 @media (max-width: 1024px) {
   .analytics-container .grid-4 {

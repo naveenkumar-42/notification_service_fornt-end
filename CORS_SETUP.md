@@ -129,3 +129,4 @@ For production:
 2. Configure CORS on your backend to only allow your production frontend domain
 3. Remove or update the proxy configuration in `package.json` if needed
 
+
