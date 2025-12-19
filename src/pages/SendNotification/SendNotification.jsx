@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Send, AlertCircle, CheckCircle } from 'lucide-react';
+import { Send, AlertCircle, CheckCircle2, Clock, Mail, MessageSquare, Bell, Smartphone } from 'lucide-react';
 import { notificationAPI } from '../../utils/api';
 import './SendNotification.css';
 
@@ -29,8 +28,18 @@ function SendNotification() {
     'CUSTOM'
   ];
 
-  const channels = ['EMAIL', 'SMS', 'PUSH', 'IN_APP'];
-  const priorities = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+  const channels = ['EMAIL', 'SMS', 'PUSH', 'INAPP'];
+  const priorities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+
+  const getChannelIcon = (channel) => {
+    switch (channel) {
+      case 'EMAIL': return <Mail size={16} />;
+      case 'SMS': return <MessageSquare size={16} />;
+      case 'PUSH': return <Bell size={16} />;
+      case 'INAPP': return <Smartphone size={16} />;
+      default: return <Mail size={16} />;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +53,7 @@ function SendNotification() {
     e.preventDefault();
     
     if (!formData.recipient || !formData.message) {
-      setAlert({ type: 'warning', message: 'Please fill in all required fields' });
+      setAlert({ type: 'warning', message: 'Please fill in all required fields (Recipient & Message).' });
       return;
     }
 
@@ -53,7 +62,7 @@ function SendNotification() {
       const response = await notificationAPI.sendNotification(formData);
       setAlert({ 
         type: 'success', 
-        message: `✓ Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}` 
+        message: `Notification queued successfully${response.data?.eventId ? ` (Event ID: ${response.data.eventId})` : ''}` 
       });
       setFormData({
         notificationType: 'USER_SIGNUP',
@@ -64,9 +73,9 @@ function SendNotification() {
         subject: '',
         scheduledTime: ''
       });
-      setTimeout(() => setAlert(null), 5000);
+      setTimeout(() => setAlert(null), 4000);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to send notification. Please check your connection and try again.';
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to send notification. Please try again.';
       setAlert({ 
         type: 'error', 
         message: errorMessage
@@ -80,94 +89,106 @@ function SendNotification() {
     <div className="send-notification-container">
       <div className="page-header">
         <h1>Send Notification</h1>
-        <p>Create and send notifications to your users with advanced options.</p>
+        <p>Craft and send notifications with type, priority, schedule and live preview.</p>
       </div>
 
       {alert && (
         <div className={`alert alert-${alert.type}`}>
           <div className="alert-content">
-            {alert.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+            {alert.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
             <span>{alert.message}</span>
           </div>
         </div>
       )}
 
-      <div className="grid-2">
-        <div className="card">
+      <div className="grid-2 send-grid">
+        <div className="card card-elevated">
           <div className="card-header">
             <h2>Notification Details</h2>
+            <span className="card-subtitle">All fields marked * are required</span>
           </div>
+
           <form onSubmit={handleSubmit} className="card-body form">
-            <div className="form-group">
-              <label htmlFor="notificationType">Notification Type *</label>
-              <select
-                id="notificationType"
-                name="notificationType"
-                value={formData.notificationType}
-                onChange={handleChange}
-                className="form-control"
-              >
-                {notificationTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="notificationType">Notification Type *</label>
+                <select
+                  id="notificationType"
+                  name="notificationType"
+                  value={formData.notificationType}
+                  onChange={handleChange}
+                  className="form-control"
+                >
+                  {notificationTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="channel">Channel *</label>
+                <div className="input-with-icon">
+                  <span className="input-icon">
+                    {getChannelIcon(formData.channel)}
+                  </span>
+                  <select
+                    id="channel"
+                    name="channel"
+                    value={formData.channel}
+                    onChange={handleChange}
+                    className="form-control with-left-icon"
+                  >
+                    {channels.map(channel => (
+                      <option key={channel} value={channel}>{channel}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="priority">Priority *</label>
+                <select
+                  id="priority"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleChange}
+                  className="form-control"
+                >
+                  {priorities.map(priority => (
+                    <option key={priority} value={priority}>{priority}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="channel">Channel *</label>
-              <select
-                id="channel"
-                name="channel"
-                value={formData.channel}
-                onChange={handleChange}
-                className="form-control"
-              >
-                {channels.map(channel => (
-                  <option key={channel} value={channel}>{channel}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="priority">Priority *</label>
-              <select
-                id="priority"
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                className="form-control"
-              >
-                {priorities.map(priority => (
-                  <option key={priority} value={priority}>{priority}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="recipient">Recipient (Email/Phone/User ID) *</label>
+              <label htmlFor="recipient">Recipient (Email / Phone / User ID) *</label>
               <input
                 type="text"
                 id="recipient"
                 name="recipient"
                 value={formData.recipient}
                 onChange={handleChange}
-                placeholder="Enter recipient email or phone"
+                placeholder="e.g. user@example.com or +91936XXXXXXX"
                 className="form-control"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="subject">Subject</label>
+              <label htmlFor="subject">Subject (Email)</label>
               <input
                 type="text"
                 id="subject"
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="Notification subject"
+                placeholder="Welcome to our platform!"
                 className="form-control"
               />
+              <small className="field-hint">
+                If empty, a default subject will be generated from the notification type.
+              </small>
             </div>
 
             <div className="form-group">
@@ -177,57 +198,81 @@ function SendNotification() {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Enter notification message"
+                placeholder="Write the notification message..."
                 className="form-control"
                 rows="5"
                 required
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="scheduledTime">Schedule (Optional)</label>
-              <input
-                type="datetime-local"
-                id="scheduledTime"
-                name="scheduledTime"
-                value={formData.scheduledTime}
-                onChange={handleChange}
-                className="form-control"
-              />
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="scheduledTime">Schedule (Optional)</label>
+                <div className="input-with-icon">
+                  <span className="input-icon">
+                    <Clock size={16} />
+                  </span>
+                  <input
+                    type="datetime-local"
+                    id="scheduledTime"
+                    name="scheduledTime"
+                    value={formData.scheduledTime}
+                    onChange={handleChange}
+                    className="form-control with-left-icon"
+                  />
+                </div>
+                <small className="field-hint">
+                  Leave empty to send immediately.
+                </small>
+              </div>
             </div>
 
-            <button 
-              type="submit" 
-              className="btn btn-primary btn-lg"
-              disabled={loading}
-            >
-              <Send size={18} />
-              {loading ? 'Sending...' : 'Send Notification'}
-            </button>
+            <div className="form-actions">
+              <button 
+                type="submit" 
+                className="btn btn-primary btn-lg"
+                disabled={loading}
+              >
+                <Send size={18} />
+                {loading ? 'Sending...' : 'Send Notification'}
+              </button>
+            </div>
           </form>
         </div>
 
-        <div className="card">
+        <div className="card card-elevated">
           <div className="card-header">
-            <h2>Preview</h2>
+            <h2>Live Preview</h2>
+            <span className="card-subtitle">See how your notification will look</span>
           </div>
           <div className="card-body preview-section">
             <div className="preview-box">
+              <div className="preview-header">
+                <div className="preview-recipient">
+                  <span className="preview-label">To:</span>
+                  <span className="preview-value">
+                    {formData.recipient || 'recipient@example.com'}
+                  </span>
+                </div>
+                <div className="preview-meta-badges">
+                  <span className={`priority-badge priority-${formData.priority.toLowerCase()}`}>
+                    {formData.priority}
+                  </span>
+                  <span className="channel-pill">
+                    {getChannelIcon(formData.channel)}
+                    <span>{formData.channel}</span>
+                  </span>
+                </div>
+              </div>
+
               {formData.subject && (
                 <div className="preview-subject">
                   <strong>Subject:</strong> {formData.subject}
                 </div>
               )}
+
               <div className="preview-message">
-                {formData.message || 'Your message will appear here...'}
-              </div>
-              <div className="preview-meta">
-                <span className={`priority-badge priority-${formData.priority.toLowerCase()}`}>
-                  {formData.priority}
-                </span>
-                <span className="channel-badge">
-                  {formData.channel}
-                </span>
+                {formData.message || 'Your notification message will appear here...'}
               </div>
             </div>
 
@@ -238,7 +283,12 @@ function SendNotification() {
                 <li><strong>Channel:</strong> {formData.channel}</li>
                 <li><strong>Priority:</strong> {formData.priority}</li>
                 <li><strong>Recipient:</strong> {formData.recipient || 'Not set'}</li>
-                {formData.scheduledTime && <li><strong>Scheduled:</strong> {new Date(formData.scheduledTime).toLocaleString()}</li>}
+                {formData.scheduledTime && (
+                  <li>
+                    <strong>Scheduled:</strong>{' '}
+                    {new Date(formData.scheduledTime).toLocaleString()}
+                  </li>
+                )}
               </ul>
             </div>
           </div>

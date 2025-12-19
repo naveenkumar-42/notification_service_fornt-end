@@ -43,7 +43,7 @@ function Dashboard() {
         return dateB - dateA; // Descending order (newest first)
       });
       
-      setRecentNotifications(sortedNotifications.slice(0, 5));
+      setRecentNotifications(sortedNotifications.slice(0, 4));
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
@@ -60,7 +60,7 @@ function Dashboard() {
         notificationType: formData.notificationType || 'ALERT',
         recipient: formData.recipient,
         channel: formData.channel || 'EMAIL',
-        priority: formData.priority || 'MEDIUM',
+        priority: formData.priority || 'CRITICAL',
         message: formData.message,
         subject: formData.subject || '',
         scheduledTime: formData.scheduledTime || ''

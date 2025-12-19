@@ -90,7 +90,7 @@ function QuickSendForm({ onSubmit }) {
         </select>
       </div>
 
-      <div className="form-group">
+      {/* <div className="form-group">
         <label htmlFor="priority">Priority *</label>
         <select
           id="priority"
@@ -105,7 +105,7 @@ function QuickSendForm({ onSubmit }) {
           <option value="HIGH">High</option>
           <option value="URGENT">Urgent</option>
         </select>
-      </div>
+      </div> */}
 
       <div className="form-group">
         <label htmlFor="message">Message *</label>
