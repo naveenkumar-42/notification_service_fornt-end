@@ -246,35 +246,74 @@ function SendNotification() {
             <span className="card-subtitle">See how your notification will look</span>
           </div>
           <div className="card-body preview-section">
-            <div className="preview-box">
-              <div className="preview-header">
-                <div className="preview-recipient">
-                  <span className="preview-label">To:</span>
-                  <span className="preview-value">
-                    {formData.recipient || 'recipient@example.com'}
-                  </span>
-                </div>
-                <div className="preview-meta-badges">
-                  <span className={`priority-badge priority-${formData.priority.toLowerCase()}`}>
-                    {formData.priority}
-                  </span>
-                  <span className="channel-pill">
-                    {getChannelIcon(formData.channel)}
-                    <span>{formData.channel}</span>
-                  </span>
-                </div>
-              </div>
+                <div className="preview-box email-template-preview">
+  <div className="email-outer">
+    <div className="email-inner">
+      {/* Header */}
+      <div className="email-header">
+        <h1>Enterprise Notification</h1>
+      </div>
 
-              {formData.subject && (
-                <div className="preview-subject">
-                  <strong>Subject:</strong> {formData.subject}
-                </div>
-              )}
+      {/* Body */}
+      <div className="email-body">
+        <p>Hello,</p>
 
-              <div className="preview-message">
-                {formData.message || 'Your notification message will appear here...'}
-              </div>
-            </div>
+        <p className="email-message">
+          {formData.message || 'Your notification message will appear here...'}
+        </p>
+
+        <hr className="email-divider" />
+
+        <table className="email-meta">
+          <tbody>
+            <tr>
+              <td className="meta-label"><strong>Notification Type:</strong></td>
+              <td className="meta-value">
+                {formData.notificationType || 'N/A'}
+              </td>
+            </tr>
+            <tr>
+              <td className="meta-label"><strong>Channel:</strong></td>
+              <td className="meta-value">
+                {formData.channel || 'EMAIL'}
+              </td>
+            </tr>
+            <tr>
+              <td className="meta-label"><strong>Subject:</strong></td>
+              <td className="meta-value">
+                {formData.subject || `[Notification] ${formData.notificationType || 'Update'}`}
+              </td>
+            </tr>
+            <tr>
+              <td className="meta-label"><strong>Recipient:</strong></td>
+              <td className="meta-value">
+                {formData.recipient || 'recipient@example.com'}
+              </td>
+            </tr>
+            {formData.scheduledTime && (
+              <tr>
+                <td className="meta-label"><strong>Scheduled:</strong></td>
+                <td className="meta-value">
+                  {new Date(formData.scheduledTime).toLocaleString()}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Footer */}
+      <div className="email-footer">
+        <p>This is an automated message. Do not reply.</p>
+      </div>
+    </div>
+
+    <p className="email-copyline">
+      © {new Date().getFullYear()} Your Organization. All rights reserved.
+    </p>
+  </div>
+</div>
+
 
             <div className="info-section">
               <h3>Configuration Summary</h3>
