@@ -1,6 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 import { notificationAPI } from '../../utils/api';
 import './Analytics.css';
 
@@ -34,31 +45,33 @@ function Analytics() {
   const processAnalytics = (data) => {
     // Status Distribution
     const statusCount = data.reduce((acc, n) => {
-      const existing = acc.find(s => s.name === n.status);
+      const existing = acc.find((s) => s.name === n.status);
       if (existing) existing.value++;
-      else acc.push({ name: n.status, value: 1 });
+      else acc.push({ name: n.status || 'UNKNOWN', value: 1 });
       return acc;
     }, []);
 
     // Priority Distribution
     const priorityCount = data.reduce((acc, n) => {
-      const existing = acc.find(p => p.name === n.priority);
+      const key = n.priority || 'UNKNOWN';
+      const existing = acc.find((p) => p.name === key);
       if (existing) existing.value++;
-      else acc.push({ name: n.priority || 'UNKNOWN', value: 1 });
+      else acc.push({ name: key, value: 1 });
       return acc;
     }, []);
 
     // Channel Distribution
     const channelCount = data.reduce((acc, n) => {
-      const existing = acc.find(c => c.name === n.channel);
+      const key = n.channel || 'UNKNOWN';
+      const existing = acc.find((c) => c.name === key);
       if (existing) existing.value++;
-      else acc.push({ name: n.channel, value: 1 });
+      else acc.push({ name: key, value: 1 });
       return acc;
     }, []);
 
     // Daily Trend (last 7 days)
     const dailyData = {};
-    data.forEach(n => {
+    data.forEach((n) => {
       const date = new Date(n.createdAt).toLocaleDateString();
       if (!dailyData[date]) dailyData[date] = { date, count: 0, sent: 0, failed: 0 };
       dailyData[date].count++;
@@ -78,7 +91,7 @@ function Analytics() {
       '5+ Retries': 0
     };
 
-    data.forEach(n => {
+    data.forEach((n) => {
       const retries = n.retryCount || 0;
       if (retries === 0) retryBuckets['0 Retries']++;
       else if (retries <= 2) retryBuckets['1-2 Retries']++;
@@ -86,7 +99,10 @@ function Analytics() {
       else retryBuckets['5+ Retries']++;
     });
 
-    const retryAnalysis = Object.entries(retryBuckets).map(([name, value]) => ({ name, value }));
+    const retryAnalysis = Object.entries(retryBuckets).map(([name, value]) => ({
+      name,
+      value
+    }));
 
     setChartData({
       statusDistribution: statusCount,
@@ -97,17 +113,59 @@ function Analytics() {
     });
   };
 
-  const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  // Color system
+  const COLORS = {
+    critical: '#ff1744', // neon red
+    high: '#ff9100', // neon orange / light red
+    medium: '#2979ff', // neon blue
+    low: '#00e676', // neon green
+    unknown: '#9ca3af'
+  };
+
+  const STATUS_COLORS = {
+    SENT: COLORS.medium,
+    DELIVERED: COLORS.low,
+    FAILED: COLORS.critical,
+    PENDING: COLORS.high,
+    QUEUED: COLORS.medium,
+    DEFAULT: COLORS.unknown
+  };
+
+  const PRIORITY_COLORS = {
+    CRITICAL: COLORS.critical,
+    HIGH: COLORS.high,
+    MEDIUM: COLORS.medium,
+    LOW: COLORS.low,
+    UNKNOWN: COLORS.unknown
+  };
+
+  const CHANNEL_COLORS = {
+    EMAIL: '#60a5fa',
+    SMS: '#34d399',
+    PUSH: '#f97316',
+    INAPP: '#a855f7',
+    'IN_APP': '#a855f7',
+    UNKNOWN: '#9ca3af'
+  };
 
   const stats = {
-    totalSent: notifications.filter(n => n.status === 'SENT').length,
-    totalFailed: notifications.filter(n => n.status === 'FAILED').length,
-    successRate: notifications.length > 0 
-      ? ((notifications.filter(n => n.status === 'SENT').length / notifications.length) * 100).toFixed(2)
-      : 0,
-    avgRetries: notifications.length > 0
-      ? (notifications.reduce((sum, n) => sum + (n.retryCount || 0), 0) / notifications.length).toFixed(2)
-      : 0
+    totalSent: notifications.filter((n) => n.status === 'SENT').length,
+    totalFailed: notifications.filter((n) => n.status === 'FAILED').length,
+    successRate:
+      notifications.length > 0
+        ? (
+            (notifications.filter((n) => n.status === 'SENT').length /
+              notifications.length) *
+            100
+          ).toFixed(2)
+        : 0,
+    avgRetries:
+      notifications.length > 0
+        ? (
+            notifications.reduce((sum, n) => sum + (n.retryCount || 0), 0) /
+            notifications.length
+          ).toFixed(2)
+        : 0
   };
 
   return (
@@ -150,13 +208,17 @@ function Analytics() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({name, value}) => `${name}: ${value}`}
-                outerRadius={100}
-                fill="#8884d8"
+                label={({ name, value }) => `${name}: ${value}`}
+                outerRadius={110}
                 dataKey="value"
               >
                 {chartData.statusDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`status-${index}`}
+                    fill={STATUS_COLORS[entry.name] || STATUS_COLORS.DEFAULT}
+                    stroke="rgba(15,23,42,0.8)"
+                    strokeWidth={1}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -173,13 +235,17 @@ function Analytics() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({name, value}) => `${name}: ${value}`}
-                outerRadius={100}
-                fill="#8884d8"
+                label={({ name, value }) => `${name}: ${value}`}
+                outerRadius={110}
                 dataKey="value"
               >
                 {chartData.priorityDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`priority-${index}`}
+                    fill={PRIORITY_COLORS[entry.name] || PRIORITY_COLORS.UNKNOWN}
+                    stroke="rgba(15,23,42,0.8)"
+                    strokeWidth={1}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -198,8 +264,18 @@ function Analytics() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="sent" fill="#10b981" name="Sent" />
-              <Bar dataKey="failed" fill="#ef4444" name="Failed" />
+              <Bar
+                dataKey="sent"
+                fill={COLORS.low}
+                name="Sent"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="failed"
+                fill={COLORS.critical}
+                name="Failed"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -212,7 +288,12 @@ function Analytics() {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" fill="#2563eb" name="Count" />
+              <Bar
+                dataKey="value"
+                fill={COLORS.medium}
+                name="Count"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -227,7 +308,16 @@ function Analytics() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="value" fill="#8b5cf6" name="Count" />
+            <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]}>
+              {chartData.channelDistribution.map((entry, index) => (
+                <Cell
+                  key={`channel-${index}`}
+                  fill={
+                    CHANNEL_COLORS[entry.name] || CHANNEL_COLORS.UNKNOWN
+                  }
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

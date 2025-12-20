@@ -56,11 +56,6 @@
   gap: var(--space-6);
 }
 
-.field-hint {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
 .input-with-icon {
   position: relative;
   display: flex;
@@ -76,8 +71,44 @@
   color: var(--color-text-secondary);
 }
 
+.input-icon.left {
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.form-control {
+  height: 40px;
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0 var(--space-12);
+  font-size: var(--font-size-sm);
+}
+
+.form-control.with-left-icon,
 .with-left-icon {
   padding-left: calc(var(--space-10) * 3);
+}
+
+textarea.form-control {
+  height: auto;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.form-row-single {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-16);
+  align-items: flex-end;
+}
+
+.field-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
 }
 
 .preview-section {
@@ -167,7 +198,6 @@
   font-size: var(--font-size-sm);
 }
 
-/* keep your existing priority-badge colors */
 .priority-badge {
   display: inline-block;
   padding: var(--space-4) var(--space-12);
@@ -177,8 +207,6 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-
-/* Email template preview (matches backend HTML) */
 
 .email-template-preview {
   background: transparent;
@@ -267,9 +295,6 @@
   text-align: center;
 }
 
-
-/* responsiveness */
-
 @media (max-width: 1024px) {
   .send-notification-container .grid-2 {
     grid-template-columns: 1fr;
@@ -277,6 +302,13 @@
   }
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row-single {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
