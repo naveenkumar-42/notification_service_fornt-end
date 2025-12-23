@@ -1,23 +1,24 @@
 import React from 'react';
-import { 
-  ChevronLeft, ChevronRight, Loader, 
-  Mail, MessageSquare, Bell, Smartphone, 
-  Clock, CheckCircle2, CheckCheck, XCircle, 
-  Loader2, AlertCircle 
+import {
+  ChevronLeft, ChevronRight, Loader,
+  Mail, MessageSquare, Bell, Smartphone,
+  Clock, CheckCircle2, CheckCheck, XCircle,
+  Loader2, AlertCircle
 } from 'lucide-react';
 import './NotificationTable.css';
 
-function NotificationTable({ 
-  notifications, 
-  loading, 
-  currentPage, 
-  totalPages, 
+function NotificationTable({
+  notifications,
+  loading,
+  currentPage,
+  totalPages,
   onPageChange,
-  totalRecords 
+  totalRecords,
+  dateFormat = 'relative'
 }) {
 
   const getStatusIcon = (status) => {
-    switch(status?.toUpperCase()) {
+    switch (status?.toUpperCase()) {
       case 'QUEUED': return <Loader2 size={14} className="animate-spin" />;
       case 'SENT': return <CheckCircle2 size={14} />;
       case 'DELIVERED': return <CheckCheck size={14} />;
@@ -28,11 +29,11 @@ function NotificationTable({
   };
 
   const getChannelIcon = (channel) => {
-    switch(channel?.toUpperCase()) {
+    switch (channel?.toUpperCase()) {
       case 'EMAIL': return <Mail size={14} />;
       case 'SMS': return <MessageSquare size={14} />;
       case 'PUSH': return <Bell size={14} />;
-      case 'INAPP': 
+      case 'INAPP':
       case 'IN_APP': return <Smartphone size={14} />;
       default: return <Mail size={14} />;
     }
@@ -40,17 +41,28 @@ function NotificationTable({
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
+
+    if (dateFormat === 'utc') {
+      return date.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+    }
+
+    if (dateFormat === 'local') {
+      return date.toLocaleString();
+    }
+
+    // Default to relative
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', day: 'numeric', 
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+
+    return date.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
     });
   };
 
@@ -96,7 +108,7 @@ function NotificationTable({
                   {notif.notificationType || 'GENERAL'}
                 </span>
               </td>
-              
+
               {/* ✅ PERFECT CHANNEL BADGE */}
               <td className="channel-cell">
                 <div className={`channel-badge channel-${notif.channel?.toLowerCase() || 'unknown'}`}>
@@ -106,7 +118,7 @@ function NotificationTable({
                   <span>{notif.channel || '-'}</span>
                 </div>
               </td>
-              
+
               {/* ✅ PERFECT PRIORITY BADGE */}
               <td className="priority-cell">
                 <div className={`priority-badge priority-${notif.priority?.toLowerCase() || 'medium'}`}>
@@ -114,9 +126,9 @@ function NotificationTable({
                   <span>{notif.priority || 'MEDIUM'}</span>
                 </div>
               </td>
-              
+
               <td className="cell-recipient">{notif.recipient || '-'}</td>
-              
+
               {/* ✅ PERFECT STATUS BADGE */}
               <td className="status-cell">
                 <div className={`status-badge status-${notif.status?.toLowerCase() || 'unknown'}`}>
@@ -126,11 +138,11 @@ function NotificationTable({
                   <span>{notif.status || 'UNKNOWN'}</span>
                 </div>
               </td>
-              
+
               <td className="cell-center">
                 <span className="retry-badge">{notif.retryCount || 0}</span>
               </td>
-              
+
               <td className="cell-date">
                 <div className="date-cell">
                   <Clock size={12} />
@@ -148,7 +160,7 @@ function NotificationTable({
         <div className="footer-info">
           Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, totalRecords)} of {totalRecords} notifications
         </div>
-        
+
         <div className="pagination">
           <button
             onClick={() => onPageChange(currentPage - 1)}

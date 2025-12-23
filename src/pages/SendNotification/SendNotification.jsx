@@ -10,15 +10,17 @@ import {
   Smartphone,
 } from "lucide-react";
 import { notificationAPI } from "../../utils/api";
+import { useSettings } from "../../context/SettingsContext";
 import "./SendNotification.css";
 
 function SendNotification() {
+  const { settings } = useSettings();
   const [formData, setFormData] = useState({
     notificationType: "USER_SIGNUP",
     recipient: "",
-    channel: "EMAIL",
+    channel: settings.defaultChannel || "EMAIL",
     priority: "MEDIUM",
-    message: "",
+    message: settings.emailSignature ? `\n\n${settings.emailSignature}` : "",
     subject: "",
     scheduledTime: "",
   });
@@ -86,16 +88,15 @@ function SendNotification() {
       const response = await notificationAPI.sendNotification(formData);
       setAlert({
         type: "success",
-        message: `Notification queued successfully${
-          response.data?.eventId ? ` (Event ID: ${response.data.eventId})` : ""
-        }`,
+        message: `Notification queued successfully${response.data?.eventId ? ` (Event ID: ${response.data.eventId})` : ""
+          }`,
       });
       setFormData({
         notificationType: "USER_SIGNUP",
         recipient: "",
-        channel: "EMAIL",
+        channel: settings.defaultChannel || "EMAIL",
         priority: "MEDIUM",
-        message: "",
+        message: settings.emailSignature ? `\n\n${settings.emailSignature}` : "",
         subject: "",
         scheduledTime: "",
       });
@@ -336,8 +337,7 @@ function SendNotification() {
                           </td>
                           <td className="meta-value">
                             {formData.subject ||
-                              `[Notification] ${
-                                formData.notificationType || "Update"
+                              `[Notification] ${formData.notificationType || "Update"
                               }`}
                           </td>
                         </tr>

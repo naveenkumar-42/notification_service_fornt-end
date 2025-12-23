@@ -1,43 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Save, AlertCircle, CheckCircle, Bell, Moon, SunMedium, Monitor } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 import './Settings.css';
 
-function Settings({ onSettingsChange }) {
-  const [settings, setSettings] = useState({
-    apiKey: '',
-    autoRefreshInterval: 10,
-    defaultChannel: 'EMAIL',
-    maxRetries: 3,
-    enableNotifications: true,
-    enableAnalytics: true,
-    theme: 'light'
-  });
-
+function Settings() {
+  const { settings, updateSettings } = useSettings();
   const [alert, setAlert] = useState(null);
   const [saving, setSaving] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(Notification?.permission || 'default');
-
-  // Load settings on mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('notificationSettings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings((prev) => ({ ...prev, ...parsed }));
-      } catch {
-        // ignore parse errors
-      }
-    }
-  }, []);
-
-  // Apply theme immediately when changed
-  useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.theme = settings.theme; // e.g. [data-theme="dark"] in global CSS
-    if (typeof onSettingsChange === 'function') {
-      onSettingsChange(settings);
-    }
-  }, [settings, onSettingsChange]);
 
   // Browser notification permission initial
   useEffect(() => {
@@ -71,28 +41,37 @@ function Settings({ onSettingsChange }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setSettings((prev) => ({
-      ...prev,
+    // For immediate feedback in UI, we can update context directly or use local state buffer if we wanted 'Cancel' functionality.
+    // Given the previous design was "Save" based, let's keep it immediate for inputs but we might want to defer saving to localStorage if strict "Save" button is needed.
+    // However, context updates are usually immediate. The "Save" button in the previous design wrote to localStorage.
+    // Our context writes to localStorage immediately on updateSettings.
+    // To keep the 'Save' button feeling meaningful, we could perhaps show a success message or validaton.
+    // Or better, adaptation: strictly follow the previous pattern but via context.
+    // Actually, simply updating context immediately is better UX for settings usually.
+    // But let's stick to the user's probably expected behavior if they see a Save button.
+    // Wait, the plan was "Replace local state management with useSettings hook".
+    // If I update context immediately, the Save button becomes redundant for persistence but useful for feedback.
+
+    // Let's implement immediate update for responsiveness but keep the "Save" button for user confirmation feeling.
+
+    updateSettings({
       [name]:
         type === 'checkbox'
           ? checked
           : type === 'number'
-          ? Number(value || 0)
-          : value
-    }));
+            ? Number(value || 0)
+            : value
+    });
   };
 
   const handleSave = () => {
-    try {
-      setSaving(true);
-      localStorage.setItem('notificationSettings', JSON.stringify(settings));
+    // Since we update context immediately on change, 'Save' is just a visual confirmation here.
+    setSaving(true);
+    setTimeout(() => {
       setAlert({ type: 'success', message: 'Settings saved successfully!' });
-      setTimeout(() => setAlert(null), 3000);
-    } catch (error) {
-      setAlert({ type: 'error', message: 'Failed to save settings.' });
-    } finally {
       setSaving(false);
-    }
+      setTimeout(() => setAlert(null), 3000);
+    }, 500);
   };
 
   const renderNotificationStatus = () => {
@@ -210,7 +189,7 @@ function Settings({ onSettingsChange }) {
                 <button
                   type="button"
                   className={`theme-pill ${settings.theme === 'light' ? 'active' : ''}`}
-                  onClick={() => setSettings((s) => ({ ...s, theme: 'light' }))}
+                  onClick={() => updateSettings({ theme: 'light' })}
                 >
                   <SunMedium size={16} />
                   <span>Light</span>
@@ -218,7 +197,7 @@ function Settings({ onSettingsChange }) {
                 <button
                   type="button"
                   className={`theme-pill ${settings.theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => setSettings((s) => ({ ...s, theme: 'dark' }))}
+                  onClick={() => updateSettings({ theme: 'dark' })}
                 >
                   <Moon size={16} />
                   <span>Dark</span>
@@ -226,7 +205,7 @@ function Settings({ onSettingsChange }) {
                 <button
                   type="button"
                   className={`theme-pill ${settings.theme === 'auto' ? 'active' : ''}`}
-                  onClick={() => setSettings((s) => ({ ...s, theme: 'auto' }))}
+                  onClick={() => updateSettings({ theme: 'auto' })}
                 >
                   <Monitor size={16} />
                   <span>Auto</span>
@@ -274,6 +253,59 @@ function Settings({ onSettingsChange }) {
               <small>
                 If disabled, the Analytics page can hide charts or reduce data fetching.
               </small>
+            </div>
+
+            <hr className="divider" style={{ margin: '20px 0', border: '0', borderTop: '1px solid var(--color-border)' }} />
+
+            <div className="form-group">
+              <label htmlFor="dateFormat">Date Format</label>
+              <select
+                id="dateFormat"
+                name="dateFormat"
+                value={settings.dateFormat}
+                onChange={handleChange}
+                className="form-control"
+              >
+                <option value="local">Local Time (e.g. 10/24/2024, 2:30 PM)</option>
+                <option value="utc">UTC (e.g. 2024-10-24 14:30:00 UTC)</option>
+                <option value="relative">Relative (e.g. 5 minutes ago)</option>
+              </select>
+              <small>How timestamps are displayed in History and Dashboard.</small>
+            </div>
+
+            <div className="form-group">
+              <label>Information Density</label>
+              <div className="theme-toggle-group">
+                <button
+                  type="button"
+                  className={`theme-pill ${settings.density === 'comfortable' ? 'active' : ''}`}
+                  onClick={() => updateSettings({ density: 'comfortable' })}
+                >
+                  <span>Comfortable</span>
+                </button>
+                <button
+                  type="button"
+                  className={`theme-pill ${settings.density === 'compact' ? 'active' : ''}`}
+                  onClick={() => updateSettings({ density: 'compact' })}
+                >
+                  <span>Compact</span>
+                </button>
+              </div>
+              <small>Adjusts the spacing of lists and tables.</small>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="emailSignature">Default Email Signature</label>
+              <textarea
+                id="emailSignature"
+                name="emailSignature"
+                value={settings.emailSignature}
+                onChange={handleChange}
+                className="form-control"
+                rows="3"
+                placeholder="e.g. Kind Regards, Support Team"
+              />
+              <small>Automatically appended to the message body in "Send Notification".</small>
             </div>
           </div>
         </div>

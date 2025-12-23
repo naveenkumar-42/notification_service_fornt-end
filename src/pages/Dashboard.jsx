@@ -5,9 +5,11 @@ import { notificationAPI } from '../utils/api';
 import StatsCard from '../components/Cards/StatsCard';
 import RecentNotifications from '../components/Dashboard/RecentNotifications';
 import QuickSendForm from '../components/Dashboard/SendForm/QuickSendForm';
+import { useSettings } from '../context/SettingsContext';
 import './Dashboard.css';
 
 function Dashboard() {
+  const { settings } = useSettings();
   const [stats, setStats] = useState({
     total: 0,
     sent: 0,
@@ -20,29 +22,31 @@ function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 10000);
+    // Use the configured interval (convert seconds to ms), default to 10s if invalid
+    const intervalTime = (settings.autoRefreshInterval || 10) * 1000;
+    const interval = setInterval(fetchDashboardData, intervalTime);
     return () => clearInterval(interval);
-  }, []);
+  }, [settings.autoRefreshInterval]);
 
   const fetchDashboardData = async () => {
     try {
       const response = await notificationAPI.getHistory();
       const notifications = response.data || [];
-      
+
       setStats({
         total: notifications.length,
         sent: notifications.filter(n => n.status === 'SENT').length,
         pending: notifications.filter(n => n.status === 'PENDING').length,
         failed: notifications.filter(n => n.status === 'FAILED').length
       });
-      
+
       // Sort by createdAt in descending order (newest first) and take first 5
       const sortedNotifications = [...notifications].sort((a, b) => {
         const dateA = new Date(a.createdAt || 0);
         const dateB = new Date(b.createdAt || 0);
         return dateB - dateA; // Descending order (newest first)
       });
-      
+
       setRecentNotifications(sortedNotifications.slice(0, 4));
       setLoading(false);
     } catch (error) {
@@ -67,9 +71,9 @@ function Dashboard() {
       };
 
       const response = await notificationAPI.sendNotification(notificationData);
-      setAlert({ 
-        type: 'success', 
-        message: `Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}` 
+      setAlert({
+        type: 'success',
+        message: `Notification sent successfully!${response.data?.eventId ? ` Event ID: ${response.data.eventId}` : ''}`
       });
       // Refresh dashboard data to show the new notification
       await fetchDashboardData();
@@ -98,32 +102,34 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="grid-4 mb-6">
-        <StatsCard
-          title="Total Notifications"
-          value={stats.total}
-          icon={BarChart}
-          color="primary"
-        />
-        <StatsCard
-          title="Sent"
-          value={stats.sent}
-          icon={CheckCircle}
-          color="success"
-        />
-        <StatsCard
-          title="Pending"
-          value={stats.pending}
-          icon={TrendingUp}
-          color="warning"
-        />
-        <StatsCard
-          title="Failed"
-          value={stats.failed}
-          icon={AlertCircle}
-          color="danger"
-        />
-      </div>
+      {settings.enableAnalytics && (
+        <div className="grid-4 mb-6">
+          <StatsCard
+            title="Total Notifications"
+            value={stats.total}
+            icon={BarChart}
+            color="primary"
+          />
+          <StatsCard
+            title="Sent"
+            value={stats.sent}
+            icon={CheckCircle}
+            color="success"
+          />
+          <StatsCard
+            title="Pending"
+            value={stats.pending}
+            icon={TrendingUp}
+            color="warning"
+          />
+          <StatsCard
+            title="Failed"
+            value={stats.failed}
+            icon={AlertCircle}
+            color="danger"
+          />
+        </div>
+      )}
 
       <div className="grid-2">
         <div className="card">

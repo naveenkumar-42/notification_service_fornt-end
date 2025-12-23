@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter, Download, RefreshCw } from 'lucide-react';
 import { notificationAPI } from '../../utils/api';
+import { useSettings } from '../../context/SettingsContext';
 import FilterSidebar from '../../components/History/FilterSidebar';
 import NotificationTable from '../../components/History/NotificationTable/NotificationTable';
 import './History.css';
 
 function History() {
+  const { settings } = useSettings();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     status: 'ALL',
     priority: 'ALL',
@@ -24,10 +27,14 @@ function History() {
   });
 
   // ✅ FIXED: Fetch data based on filters (SERVER-SIDE)
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = useCallback(async (isRefresh = false) => {
     try {
-      setLoading(true);
-      
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       // Build backend filter params
       const params = {
         status: filters.status === 'ALL' ? null : filters.status,
@@ -38,12 +45,13 @@ function History() {
 
       const response = await notificationAPI.getFilteredHistory(params);
       setNotifications(response.data || []);
-      
+
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
-      setNotifications([]);
+      if (!isRefresh) setNotifications([]);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [filters.status, filters.priority, filters.channel, filters.dateRange]);
 
@@ -56,7 +64,7 @@ function History() {
 
   // ✅ Client-side search (on already filtered data)
   const filteredNotifications = notifications.filter(notif =>
-    !searchTerm || 
+    !searchTerm ||
     notif.recipient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     notif.id?.toString().includes(searchTerm) ||
     notif.message?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -106,13 +114,21 @@ function History() {
       <div className="page-header flex-between">
         <div>
           <h1>Notification History</h1>
-          <p>{filteredNotifications.length} of {notifications.length} notifications 
-            {filters.status !== 'ALL' || filters.priority !== 'ALL' || filters.channel !== 'ALL' || filters.dateRange !== 'all' 
+          <p>{filteredNotifications.length} of {notifications.length} notifications
+            {filters.status !== 'ALL' || filters.priority !== 'ALL' || filters.channel !== 'ALL' || filters.dateRange !== 'all'
               ? ' (filtered)' : ''
             }
           </p>
         </div>
         <div className="header-actions">
+          <button
+            className="btn btn-secondary"
+            onClick={() => fetchNotifications(true)}
+            disabled={loading || refreshing}
+          >
+            <RefreshCw size={18} className={refreshing ? 'spin-anim' : ''} />
+            {refreshing ? 'Refreshing...' : 'Reload'}
+          </button>
           <button className="btn btn-secondary" onClick={() => setShowFilters(!showFilters)}>
             <Filter size={18} />
             {showFilters ? 'Hide' : 'Show'} Filters
@@ -154,6 +170,7 @@ function History() {
             totalPages={totalPages}
             onPageChange={(page) => setPagination({ ...pagination, currentPage: page })}
             totalRecords={filteredNotifications.length}
+            dateFormat={settings.dateFormat}
           />
         </div>
       </div>
