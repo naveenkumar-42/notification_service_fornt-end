@@ -10,8 +10,10 @@ import SendNotification from './pages/SendNotification/SendNotification';
 import History from './pages/History/History';
 import Analytics from './pages/Analytics/Analytics';
 import Settings from './pages/Settings/Settings';
+import Profile from './pages/Profile/Profile';
 
 import './App.css';
+import './theme-override.css';
 import Login from './pages/Login/Login';
 import Signup from './pages/Signup/Signup';
 
@@ -91,6 +93,7 @@ function AppContent() {
             <Route path="/history" element={<History />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
             {/* Redirect legacy or unknown routes if needed, or keeping them separate */}
           </Routes>
         </div>

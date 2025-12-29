@@ -1,9 +1,12 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu, Bell, User } from 'lucide-react';
 import './Header.css';
 
 function Header({ onMenuToggle }) {
+  const navigate = useNavigate();
+
   return (
     <header className="header">
       <div className="header-left">
@@ -21,7 +24,7 @@ function Header({ onMenuToggle }) {
           <Bell size={20} />
           <span className="badge">3</span>
         </button>
-        <button className="icon-btn user-btn">
+        <button className="icon-btn user-btn" onClick={() => navigate('/profile')}>
           <User size={20} />
         </button>
       </div>

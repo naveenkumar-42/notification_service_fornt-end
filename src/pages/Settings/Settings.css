@@ -658,3 +658,35 @@
     justify-content: center;
   }
 }
+/* Logout Section in Settings */
+.settings-logout-section {
+  margin-top: var(--space-32);
+  padding-top: var(--space-24);
+  border-top: 2px solid var(--color-border);
+}
+
+.btn-settings-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-32);
+  background: var(--color-error);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-settings-logout:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+.btn-settings-logout:active {
+  transform: translateY(0);
+}

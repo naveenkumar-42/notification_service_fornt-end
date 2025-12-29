@@ -1,14 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Save, AlertCircle, CheckCircle, Bell, Moon, SunMedium, Monitor, Key, Settings as SettingsIcon, Palette, Clock, Mail, Info } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Save, AlertCircle, CheckCircle, Bell, Moon, SunMedium, Monitor, Key, Settings as SettingsIcon, Palette, Clock, Mail, Info, LogOut } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { auth } from '../../firebase/config';
+import { signOut } from 'firebase/auth';
 import './Settings.css';
 
 function Settings() {
   const { settings, updateSettings } = useSettings();
+  const navigate = useNavigate();
   const [alert, setAlert] = useState(null);
   const [saving, setSaving] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(Notification?.permission || 'default');
   const [activeSection, setActiveSection] = useState('api');
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      setAlert({ type: 'error', message: 'Failed to logout. Please try again.' });
+      setTimeout(() => setAlert(null), 3000);
+    }
+  };
 
   // Browser notification permission initial
   useEffect(() => {
@@ -428,6 +443,14 @@ function Settings() {
                   <div className="feature-tag">Multi-Channel</div>
                   <div className="feature-tag">Real-time Analytics</div>
                   <div className="feature-tag">Smart Routing</div>
+                </div>
+
+                {/* Logout Button */}
+                <div className="settings-logout-section">
+                  <button className="btn-settings-logout" onClick={handleLogout}>
+                    <LogOut size={18} />
+                    Sign Out
+                  </button>
                 </div>
               </div>
             </div>

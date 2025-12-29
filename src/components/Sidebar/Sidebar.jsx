@@ -22,7 +22,7 @@ function Sidebar({ isOpen }) {
       <div className="sidebar-header">
         <div className="logo">
           <Send size={28} />
-          <span>Notifications</span>
+          <span>Nk's Notifications</span>
         </div>
       </div>
 

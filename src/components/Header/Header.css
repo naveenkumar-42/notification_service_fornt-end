@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow-sm);
-  height: 70px;
+  height: 80px;
 }
 
 .header-left {
