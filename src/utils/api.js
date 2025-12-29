@@ -1,14 +1,15 @@
 import axios from 'axios';
+import { auth } from '../firebase/config';
 
 // Use proxy in development, absolute URL in production
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
+const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? 'http://localhost:8080/api/notifications'
   : '/api/notifications';
 
 // Create axios instance with default configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { 
+  headers: {
     'Content-Type': 'application/json',
   },
   timeout: 30000, // 30 seconds timeout
@@ -16,12 +17,16 @@ const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use(
-  (config) => {
-    // Add any auth tokens or headers here if needed
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+  async (config) => {
+    // Add Firebase ID Token to headers
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      } catch (error) {
+        console.error('Error getting auth token:', error);
+      }
+    }
     return config;
   },
   (error) => {
@@ -39,7 +44,7 @@ api.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       const { status, data } = error.response;
-      
+
       switch (status) {
         case 400:
           console.error('Bad Request:', data.message || 'Invalid request');
@@ -66,7 +71,7 @@ api.interceptors.response.use(
       // Something else happened
       console.error('Error:', error.message);
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -75,16 +80,16 @@ api.interceptors.response.use(
 export const notificationAPI = {
   // Send a notification
   sendNotification: (data) => api.post('/send', data),
-  
+
   // Get notification status by event ID
   getStatus: (eventId) => api.get(`/status/${eventId}`),
-  
+
   // Get all notification history
   getHistory: () => api.get('/history'),
-  
+
   // Get notifications filtered by status
   getByStatus: (status) => api.get(`/status-filter/${status}`),
-  
+
   // Health check endpoint
   healthCheck: () => api.get('/health'),
 

@@ -17,7 +17,7 @@ function Header({ onMenuToggle }) {
       </div>
 
       <div className="header-center">
-        <h2>Notification Management System</h2>
+        <h2> Nk's Notification Management System</h2>
       </div>
 
       <div className="header-right">

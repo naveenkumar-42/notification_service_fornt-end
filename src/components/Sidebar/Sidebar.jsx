@@ -21,8 +21,8 @@ function Sidebar({ isOpen }) {
     <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
         <div className="logo">
-          <Send size={28} />
-          <span>Nk's Notifications</span>
+          <div className="logo-icon"></div>
+          <span>Notify</span>
         </div>
       </div>
 
