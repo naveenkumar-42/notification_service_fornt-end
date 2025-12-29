@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, AlertCircle, CheckCircle, Bell, Moon, SunMedium, Monitor } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle, Bell, Moon, SunMedium, Monitor, Key, Settings as SettingsIcon, Palette, Clock, Mail, Info } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import './Settings.css';
 
@@ -8,6 +8,7 @@ function Settings() {
   const [alert, setAlert] = useState(null);
   const [saving, setSaving] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(Notification?.permission || 'default');
+  const [activeSection, setActiveSection] = useState('api');
 
   // Browser notification permission initial
   useEffect(() => {
@@ -41,19 +42,6 @@ function Settings() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    // For immediate feedback in UI, we can update context directly or use local state buffer if we wanted 'Cancel' functionality.
-    // Given the previous design was "Save" based, let's keep it immediate for inputs but we might want to defer saving to localStorage if strict "Save" button is needed.
-    // However, context updates are usually immediate. The "Save" button in the previous design wrote to localStorage.
-    // Our context writes to localStorage immediately on updateSettings.
-    // To keep the 'Save' button feeling meaningful, we could perhaps show a success message or validaton.
-    // Or better, adaptation: strictly follow the previous pattern but via context.
-    // Actually, simply updating context immediately is better UX for settings usually.
-    // But let's stick to the user's probably expected behavior if they see a Save button.
-    // Wait, the plan was "Replace local state management with useSettings hook".
-    // If I update context immediately, the Save button becomes redundant for persistence but useful for feedback.
-
-    // Let's implement immediate update for responsiveness but keep the "Save" button for user confirmation feeling.
-
     updateSettings({
       [name]:
         type === 'checkbox'
@@ -65,7 +53,6 @@ function Settings() {
   };
 
   const handleSave = () => {
-    // Since we update context immediately on change, 'Save' is just a visual confirmation here.
     setSaving(true);
     setTimeout(() => {
       setAlert({ type: 'success', message: 'Settings saved successfully!' });
@@ -87,11 +74,19 @@ function Settings() {
     return <span className="badge badge-info">Not requested</span>;
   };
 
+  const sections = [
+    { id: 'api', label: 'API & Integration', icon: Key },
+    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'preferences', label: 'Preferences', icon: SettingsIcon },
+    { id: 'about', label: 'About', icon: Info }
+  ];
+
   return (
     <div className="settings-container">
       <div className="page-header">
         <h1>Settings</h1>
-        <p>Configure how your notification dashboard behaves.</p>
+        <p>Customize your notification dashboard experience</p>
       </div>
 
       {alert && (
@@ -103,237 +98,359 @@ function Settings() {
         </div>
       )}
 
-      <div className="grid-2 settings-grid">
-        {/* API Configuration */}
-        <div className="card card-elevated">
-          <div className="card-header">
-            <h2>API Configuration</h2>
-            <span className="card-subtitle">Connect your backend services</span>
-          </div>
-          <div className="card-body">
-            <div className="form-group">
-              <label htmlFor="apiKey">API Key</label>
-              <input
-                type="password"
-                id="apiKey"
-                name="apiKey"
-                value={settings.apiKey}
-                onChange={handleChange}
-                placeholder="Enter your API key"
-                className="form-control"
-              />
-              <small>Stored only in your browser (localStorage). Never share this key.</small>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="defaultChannel">Default Channel</label>
-              <select
-                id="defaultChannel"
-                name="defaultChannel"
-                value={settings.defaultChannel}
-                onChange={handleChange}
-                className="form-control"
+      <div className="settings-layout">
+        {/* Sidebar Navigation */}
+        <div className="settings-sidebar">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            return (
+              <button
+                key={section.id}
+                className={`settings-nav-item ${activeSection === section.id ? 'active' : ''}`}
+                onClick={() => setActiveSection(section.id)}
               >
-                <option value="EMAIL">Email</option>
-                <option value="SMS">SMS</option>
-                <option value="PUSH">Push Notification</option>
-                <option value="INAPP">In-App</option>
-              </select>
-              <small>Used as the default channel in the Send Notification page.</small>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="maxRetries">Max Retries</label>
-              <input
-                type="number"
-                id="maxRetries"
-                name="maxRetries"
-                value={settings.maxRetries}
-                onChange={handleChange}
-                min="0"
-                max="10"
-                className="form-control"
-              />
-              <small>Frontend hint for how many retry attempts you expect per notification.</small>
-            </div>
-          </div>
+                <Icon size={18} />
+                <span>{section.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Application Settings */}
-        <div className="card card-elevated">
-          <div className="card-header">
-            <h2>Application Settings</h2>
-            <span className="card-subtitle">Customize dashboard behavior</span>
-          </div>
-          <div className="card-body">
-            <div className="form-group">
-              <label htmlFor="autoRefreshInterval">Auto-Refresh Interval (seconds)</label>
-              <input
-                type="number"
-                id="autoRefreshInterval"
-                name="autoRefreshInterval"
-                value={settings.autoRefreshInterval}
-                onChange={handleChange}
-                min="5"
-                max="60"
-                className="form-control"
-              />
-              <small>
-                Controls how often the History & Analytics pages can refresh in the background.
-              </small>
-            </div>
-
-            <div className="form-group">
-              <label>Theme</label>
-              <div className="theme-toggle-group">
-                <button
-                  type="button"
-                  className={`theme-pill ${settings.theme === 'light' ? 'active' : ''}`}
-                  onClick={() => updateSettings({ theme: 'light' })}
-                >
-                  <SunMedium size={16} />
-                  <span>Light</span>
-                </button>
-                <button
-                  type="button"
-                  className={`theme-pill ${settings.theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => updateSettings({ theme: 'dark' })}
-                >
-                  <Moon size={16} />
-                  <span>Dark</span>
-                </button>
-                <button
-                  type="button"
-                  className={`theme-pill ${settings.theme === 'auto' ? 'active' : ''}`}
-                  onClick={() => updateSettings({ theme: 'auto' })}
-                >
-                  <Monitor size={16} />
-                  <span>Auto</span>
-                </button>
+        {/* Content Area */}
+        <div className="settings-content">
+          {/* API Configuration */}
+          {activeSection === 'api' && (
+            <div className="settings-section fade-in">
+              <div className="section-header">
+                <Key size={24} />
+                <div>
+                  <h2>API & Integration</h2>
+                  <p>Connect and configure your backend services</p>
+                </div>
               </div>
-              <small>Auto will follow your system appearance.</small>
-            </div>
 
-            <div className="form-group checkbox">
-              <label>
-                <input
-                  type="checkbox"
-                  name="enableNotifications"
-                  checked={settings.enableNotifications}
-                  onChange={handleChange}
-                />
-                <span>Enable Browser Notifications</span>
-                <span className="notification-status">{renderNotificationStatus()}</span>
-              </label>
-              {settings.enableNotifications && notificationPermission !== 'granted' && (
-                <button
-                  type="button"
-                  className="btn btn-outline btn-xs"
-                  onClick={requestNotificationPermission}
-                >
-                  <Bell size={14} />
-                  Request Permission
-                </button>
-              )}
-              <small>
-                When enabled, the app can trigger browser notifications for important events (if allowed).
-              </small>
-            </div>
+              <div className="settings-group">
+                <div className="form-field">
+                  <label htmlFor="apiKey">
+                    <span className="label-text">API Key</span>
+                    <span className="label-badge">Secure</span>
+                  </label>
+                  <input
+                    type="password"
+                    id="apiKey"
+                    name="apiKey"
+                    value={settings.apiKey}
+                    onChange={handleChange}
+                    placeholder="Enter your API key"
+                    className="input-field"
+                  />
+                  <small>Stored only in your browser (localStorage). Never share this key.</small>
+                </div>
 
-            <div className="form-group checkbox">
-              <label>
-                <input
-                  type="checkbox"
-                  name="enableAnalytics"
-                  checked={settings.enableAnalytics}
-                  onChange={handleChange}
-                />
-                <span>Enable Analytics</span>
-              </label>
-              <small>
-                If disabled, the Analytics page can hide charts or reduce data fetching.
-              </small>
-            </div>
+                <div className="form-field">
+                  <label htmlFor="defaultChannel">
+                    <span className="label-text">Default Channel</span>
+                  </label>
+                  <select
+                    id="defaultChannel"
+                    name="defaultChannel"
+                    value={settings.defaultChannel}
+                    onChange={handleChange}
+                    className="input-field"
+                  >
+                    <option value="EMAIL">📧 Email</option>
+                    <option value="SMS">💬 SMS</option>
+                    <option value="PUSH">🔔 Push Notification</option>
+                    <option value="INAPP">📱 In-App</option>
+                  </select>
+                  <small>Used as the default channel in the Send Notification page.</small>
+                </div>
 
-            <hr className="divider" style={{ margin: '20px 0', border: '0', borderTop: '1px solid var(--color-border)' }} />
-
-            <div className="form-group">
-              <label htmlFor="dateFormat">Date Format</label>
-              <select
-                id="dateFormat"
-                name="dateFormat"
-                value={settings.dateFormat}
-                onChange={handleChange}
-                className="form-control"
-              >
-                <option value="local">Local Time (e.g. 10/24/2024, 2:30 PM)</option>
-                <option value="utc">UTC (e.g. 2024-10-24 14:30:00 UTC)</option>
-                <option value="relative">Relative (e.g. 5 minutes ago)</option>
-              </select>
-              <small>How timestamps are displayed in History and Dashboard.</small>
-            </div>
-
-            <div className="form-group">
-              <label>Information Density</label>
-              <div className="theme-toggle-group">
-                <button
-                  type="button"
-                  className={`theme-pill ${settings.density === 'comfortable' ? 'active' : ''}`}
-                  onClick={() => updateSettings({ density: 'comfortable' })}
-                >
-                  <span>Comfortable</span>
-                </button>
-                <button
-                  type="button"
-                  className={`theme-pill ${settings.density === 'compact' ? 'active' : ''}`}
-                  onClick={() => updateSettings({ density: 'compact' })}
-                >
-                  <span>Compact</span>
-                </button>
+                <div className="form-field">
+                  <label htmlFor="maxRetries">
+                    <span className="label-text">Max Retries</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="maxRetries"
+                    name="maxRetries"
+                    value={settings.maxRetries}
+                    onChange={handleChange}
+                    min="0"
+                    max="10"
+                    className="input-field"
+                  />
+                  <small>Maximum retry attempts per notification.</small>
+                </div>
               </div>
-              <small>Adjusts the spacing of lists and tables.</small>
             </div>
+          )}
 
-            <div className="form-group">
-              <label htmlFor="emailSignature">Default Email Signature</label>
-              <textarea
-                id="emailSignature"
-                name="emailSignature"
-                value={settings.emailSignature}
-                onChange={handleChange}
-                className="form-control"
-                rows="3"
-                placeholder="e.g. Kind Regards, Support Team"
-              />
-              <small>Automatically appended to the message body in "Send Notification".</small>
+          {/* Appearance */}
+          {activeSection === 'appearance' && (
+            <div className="settings-section fade-in">
+              <div className="section-header">
+                <Palette size={24} />
+                <div>
+                  <h2>Appearance</h2>
+                  <p>Customize the look and feel of your dashboard</p>
+                </div>
+              </div>
+
+              <div className="settings-group">
+                <div className="form-field">
+                  <label>
+                    <span className="label-text">Theme Mode</span>
+                  </label>
+                  <div className="theme-selector">
+                    <button
+                      type="button"
+                      className={`theme-option ${settings.theme === 'light' ? 'active' : ''}`}
+                      onClick={() => updateSettings({ theme: 'light' })}
+                    >
+                      <SunMedium size={20} />
+                      <span>Light</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`theme-option ${settings.theme === 'dark' ? 'active' : ''}`}
+                      onClick={() => updateSettings({ theme: 'dark' })}
+                    >
+                      <Moon size={20} />
+                      <span>Dark</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`theme-option ${settings.theme === 'auto' ? 'active' : ''}`}
+                      onClick={() => updateSettings({ theme: 'auto' })}
+                    >
+                      <Monitor size={20} />
+                      <span>Auto</span>
+                    </button>
+                  </div>
+                  <small>Auto mode follows your system appearance settings.</small>
+                </div>
+
+                <div className="form-field">
+                  <label>
+                    <span className="label-text">Information Density</span>
+                  </label>
+                  <div className="density-selector">
+                    <button
+                      type="button"
+                      className={`density-option ${settings.density === 'comfortable' ? 'active' : ''}`}
+                      onClick={() => updateSettings({ density: 'comfortable' })}
+                    >
+                      <div className="density-preview">
+                        <div className="line"></div>
+                        <div className="line"></div>
+                        <div className="line"></div>
+                      </div>
+                      <span>Comfortable</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`density-option ${settings.density === 'compact' ? 'active' : ''}`}
+                      onClick={() => updateSettings({ density: 'compact' })}
+                    >
+                      <div className="density-preview compact">
+                        <div className="line"></div>
+                        <div className="line"></div>
+                        <div className="line"></div>
+                        <div className="line"></div>
+                      </div>
+                      <span>Compact</span>
+                    </button>
+                  </div>
+                  <small>Adjusts the spacing of lists and tables.</small>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Notifications */}
+          {activeSection === 'notifications' && (
+            <div className="settings-section fade-in">
+              <div className="section-header">
+                <Bell size={24} />
+                <div>
+                  <h2>Notifications</h2>
+                  <p>Manage browser notifications and alerts</p>
+                </div>
+              </div>
+
+              <div className="settings-group">
+                <div className="toggle-card">
+                  <div className="toggle-header">
+                    <div>
+                      <h3>Browser Notifications</h3>
+                      <p>Receive real-time alerts in your browser</p>
+                    </div>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        name="enableNotifications"
+                        checked={settings.enableNotifications}
+                        onChange={handleChange}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="toggle-status">
+                    <span>Status: {renderNotificationStatus()}</span>
+                    {settings.enableNotifications && notificationPermission !== 'granted' && (
+                      <button
+                        type="button"
+                        className="btn-request"
+                        onClick={requestNotificationPermission}
+                      >
+                        <Bell size={16} />
+                        Request Permission
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="toggle-card">
+                  <div className="toggle-header">
+                    <div>
+                      <h3>Analytics Tracking</h3>
+                      <p>Enable data collection for analytics</p>
+                    </div>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        name="enableAnalytics"
+                        checked={settings.enableAnalytics}
+                        onChange={handleChange}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Preferences */}
+          {activeSection === 'preferences' && (
+            <div className="settings-section fade-in">
+              <div className="section-header">
+                <SettingsIcon size={24} />
+                <div>
+                  <h2>Preferences</h2>
+                  <p>Configure dashboard behavior and defaults</p>
+                </div>
+              </div>
+
+              <div className="settings-group">
+                <div className="form-field">
+                  <label htmlFor="autoRefreshInterval">
+                    <Clock size={16} />
+                    <span className="label-text">Auto-Refresh Interval</span>
+                  </label>
+                  <div className="input-with-unit">
+                    <input
+                      type="number"
+                      id="autoRefreshInterval"
+                      name="autoRefreshInterval"
+                      value={settings.autoRefreshInterval}
+                      onChange={handleChange}
+                      min="5"
+                      max="60"
+                      className="input-field"
+                    />
+                    <span className="unit">seconds</span>
+                  </div>
+                  <small>Controls how often the History & Analytics pages refresh.</small>
+                </div>
+
+                <div className="form-field">
+                  <label htmlFor="dateFormat">
+                    <span className="label-text">Date Format</span>
+                  </label>
+                  <select
+                    id="dateFormat"
+                    name="dateFormat"
+                    value={settings.dateFormat}
+                    onChange={handleChange}
+                    className="input-field"
+                  >
+                    <option value="local">📅 Local Time (e.g. 10/24/2024, 2:30 PM)</option>
+                    <option value="utc">🌍 UTC (e.g. 2024-10-24 14:30:00 UTC)</option>
+                    <option value="relative">⏱️ Relative (e.g. 5 minutes ago)</option>
+                  </select>
+                  <small>How timestamps are displayed in History and Dashboard.</small>
+                </div>
+
+                <div className="form-field">
+                  <label htmlFor="emailSignature">
+                    <Mail size={16} />
+                    <span className="label-text">Default Email Signature</span>
+                  </label>
+                  <textarea
+                    id="emailSignature"
+                    name="emailSignature"
+                    value={settings.emailSignature}
+                    onChange={handleChange}
+                    className="input-field"
+                    rows="4"
+                    placeholder="e.g. Kind Regards,&#10;Support Team"
+                  />
+                  <small>Automatically appended to email notifications.</small>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* About */}
+          {activeSection === 'about' && (
+            <div className="settings-section fade-in">
+              <div className="section-header">
+                <Info size={24} />
+                <div>
+                  <h2>About</h2>
+                  <p>Application information and version</p>
+                </div>
+              </div>
+
+              <div className="about-card">
+                <div className="about-icon">
+                  <Bell size={48} />
+                </div>
+                <h3>Notification Management System</h3>
+                <div className="version-badge">Version 1.0.0</div>
+                <p>
+                  A comprehensive notification management platform for sending, tracking,
+                  and analyzing notifications with rule-based routing and analytics.
+                </p>
+                <div className="about-features">
+                  <div className="feature-tag">Multi-Channel</div>
+                  <div className="feature-tag">Real-time Analytics</div>
+                  <div className="feature-tag">Smart Routing</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="card mt-6">
-        <div className="card-header">
-          <h2>About</h2>
+      {/* Fixed Save Bar */}
+      <div className="settings-save-bar">
+        <div className="save-bar-content">
+          <div className="save-info">
+            <CheckCircle size={18} />
+            <span>All changes are auto-saved</span>
+          </div>
+          <button
+            className="btn-save"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            <Save size={18} />
+            {saving ? 'Saving...' : 'Save Settings'}
+          </button>
         </div>
-        <div className="card-body">
-          <p><strong>Notification Management System</strong></p>
-          <p>Version: 1.0.0</p>
-          <p>
-            A comprehensive notification management platform for sending, tracking,
-            and analyzing notifications with rule-based routing and analytics.
-          </p>
-        </div>
-      </div>
-
-      <div className="form-actions mt-6">
-        <button
-          className="btn btn-primary btn-lg"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          <Save size={18} />
-          {saving ? 'Saving...' : 'Save Settings'}
-        </button>
       </div>
     </div>
   );

@@ -1,0 +1,70 @@
+/* Override global colors to match Auth pages */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Indigo/Pink Color Scheme (from Auth pages) */
+    --color-primary: #4f46e5 !important;
+    --color-primary-hover: #4338ca !important;
+    --color-primary-active: #3730a3 !important;
+    --color-primary-rgb: 79, 70, 229 !important;
+
+    /* Background colors */
+    --color-background: #f8fafc !important;
+    --color-surface: #ffffff !important;
+
+    /* Text colors */
+    --color-text: #0f172a !important;
+    --color-text-secondary: #64748b !important;
+
+    /* Border colors */
+    --color-border: rgba(100, 116, 139, 0.2) !important;
+    --color-card-border: rgba(100, 116, 139, 0.12) !important;
+
+    /* Button text */
+    --color-btn-primary-text: #ffffff !important;
+
+    /* Secondary colors */
+    --color-secondary: rgba(100, 116, 139, 0.12) !important;
+    --color-secondary-hover: rgba(100, 116, 139, 0.2) !important;
+
+    /* Status colors */
+    --color-success: #22c55e !important;
+    --color-error: #ef4444 !important;
+    --color-warning: #f97316 !important;
+    --color-info: #06b6d4 !important;
+
+    /* Focus ring */
+    --color-focus-ring: rgba(79, 70, 229, 0.2) !important;
+
+    /* Typography */
+    --font-family-base: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-background: #0f172a !important;
+        --color-surface: #1e293b !important;
+        --color-text: #f1f5f9 !important;
+        --color-text-secondary: #94a3b8 !important;
+        --color-primary: #818cf8 !important;
+        --color-primary-hover: #6366f1 !important;
+        --color-border: rgba(148, 163, 184, 0.3) !important;
+    }
+}
+
+[data-color-scheme="dark"] {
+    --color-background: #0f172a !important;
+    --color-surface: #1e293b !important;
+    --color-text: #f1f5f9 !important;
+    --color-text-secondary: #94a3b8 !important;
+    --color-primary: #818cf8 !important;
+    --color-primary-hover: #6366f1 !important;
+    --color-border: rgba(148, 163, 184, 0.3) !important;
+}
+
+/* Apply Outfit font globally */
+body,
+html {
+    font-family: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
