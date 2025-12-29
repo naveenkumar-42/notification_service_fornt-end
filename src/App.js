@@ -12,10 +12,15 @@ import Analytics from './pages/Analytics/Analytics';
 import Settings from './pages/Settings/Settings';
 
 import './App.css';
+import Login from './pages/Login/Login';
+import Signup from './pages/Signup/Signup';
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
+
+  // Check if we are on an auth page
+  const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
   const handleMenuToggle = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -27,14 +32,20 @@ function AppContent() {
 
   // AUTO CLOSE: Close sidebar when route changes (mobile navigation)
   useEffect(() => {
+    // Only apply sidebar logic if not on auth page
+    if (isAuthPage) return;
+
     if (window.innerWidth <= 768) {
       setIsSidebarOpen(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isAuthPage]);
 
   // Reset sidebar state on window resize (desktop always shows sidebar)
   useEffect(() => {
     const handleResize = () => {
+      // Only apply sidebar logic if not on auth page
+      if (isAuthPage) return;
+
       if (window.innerWidth > 768) {
         setIsSidebarOpen(true);
       }
@@ -44,7 +55,17 @@ function AppContent() {
     handleResize(); // Check initial load
 
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isAuthPage]);
+
+  // If we are on an auth page, render just the routes without the dashboard layout
+  if (isAuthPage) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="app-container">
@@ -69,6 +90,7 @@ function AppContent() {
             <Route path="/history" element={<History />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
+            {/* Redirect legacy or unknown routes if needed, or keeping them separate */}
           </Routes>
         </div>
       </div>
