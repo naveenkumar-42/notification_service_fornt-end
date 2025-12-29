@@ -92,11 +92,11 @@
     margin: 0 0 var(--space-12) 0;
 }
 
-.badge-verified {
+.badge-verified-p {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-12);
+    gap: 5px;
+    padding: 10px;
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08));
     color: #16a34a;
     border: 1px solid rgba(34, 197, 94, 0.3);

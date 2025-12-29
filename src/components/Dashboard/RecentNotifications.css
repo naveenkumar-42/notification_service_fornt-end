@@ -1,69 +1,99 @@
-
 .recent-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: var(--space-16);
 }
 
 .notification-item {
-  padding: var(--space-12);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-base);
-  background-color: var(--color-surface);
+  position: relative;
+  padding: var(--space-16);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
   transition: all var(--duration-normal) var(--ease-standard);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.notification-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity var(--duration-normal);
 }
 
 .notification-item:hover {
-  background: var(--color-secondary);
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.03), transparent);
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.notification-item:hover::before {
+  opacity: 1;
 }
 
 .notif-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-12);
 }
 
 .notif-id {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.02em;
+  padding: var(--space-2) var(--space-8);
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
 }
 
 .notif-message {
-  margin: var(--space-8) 0;
-  font-size: var(--font-size-base);
+  margin: 0 0 var(--space-12) 0;
+  font-size: var(--font-size-sm);
   color: var(--color-text);
-  line-height: var(--line-height-normal);
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .notif-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: var(--space-8);
+  gap: var(--space-8);
 }
 
 .notif-time {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-weight: 500;
 }
 
+/* Loading State */
 .loading-state,
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-32) var(--space-20);
+  padding: var(--space-48) var(--space-24);
   color: var(--color-text-secondary);
+  text-align: center;
 }
 
 .spinner {
-  animation: spin 2s linear infinite;
+  animation: spin 1s linear infinite;
   margin-bottom: var(--space-16);
   color: var(--color-primary);
 }
@@ -72,15 +102,24 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
+/* Empty State */
+.empty-state {
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.03), transparent);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--color-border);
+  padding: var(--space-48) var(--space-24);
+}
+
 .empty-state p {
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--space-8);
-  font-size: var(--font-size-base);
+  font-weight: 600;
+  margin: 0 0 var(--space-8) 0;
+  font-size: var(--font-size-lg);
   color: var(--color-text);
 }
 
@@ -89,40 +128,108 @@
   color: var(--color-text-secondary);
 }
 
-/* Mobile responsive styles */
-@media (max-width: 480px) {
+/* Badge Styles - Enhanced */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08));
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.08));
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.08));
+  color: #d97706;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.badge-info {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.08));
+  color: #0891b2;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+/* Outline Badge */
+.badge-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-10);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: transparent;
+}
+
+.badge-outline.badge-success {
+  border: 1.5px solid #16a34a;
+  color: #16a34a;
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.badge-outline.badge-danger {
+  border: 1.5px solid #dc2626;
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.badge-outline.badge-warning {
+  border: 1.5px solid #d97706;
+  color: #d97706;
+  background: rgba(249, 115, 22, 0.05);
+}
+
+.badge-outline.badge-info {
+  border: 1.5px solid #0891b2;
+  color: #0891b2;
+  background: rgba(6, 182, 212, 0.05);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
   .notification-item {
-    padding: var(--space-10);
+    padding: var(--space-12);
+  }
+
+  .notification-item:hover {
+    transform: none;
   }
 
   .notif-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-6);
-  }
-
-  .notif-id {
-    font-size: var(--font-size-xs);
+    gap: var(--space-8);
   }
 
   .notif-message {
     font-size: var(--font-size-sm);
-    margin: var(--space-6) 0;
+    margin-bottom: var(--space-10);
   }
 
   .notif-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-6);
-    margin-top: var(--space-6);
-  }
-
-  .notif-time {
-    font-size: 10px;
+    gap: var(--space-8);
   }
 
   .loading-state,
   .empty-state {
-    padding: var(--space-24) var(--space-16);
+    padding: var(--space-32) var(--space-16);
   }
 }

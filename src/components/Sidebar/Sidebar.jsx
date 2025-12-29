@@ -43,7 +43,7 @@ function Sidebar({ isOpen }) {
       </nav>
 
       <div className="sidebar-footer">
-        <p>© 2024 Notification Manager</p>
+        <p>© 2025 Notification Manager</p>
       </div>
     </aside>
   );

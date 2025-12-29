@@ -83,7 +83,7 @@ function Profile() {
                         <h2>{user.displayName}</h2>
                         <p className="profile-email">{user.email}</p>
                         {user.emailVerified ? (
-                            <span className="badge badge-verified">
+                            <span className="badge badge-verified-p">
                                 <Shield size={14} />
                                 Verified
                             </span>
