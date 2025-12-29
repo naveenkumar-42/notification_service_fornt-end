@@ -18,13 +18,14 @@ const Settings = lazy(() => import('./pages/Settings/Settings'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
 const Login = lazy(() => import('./pages/Login/Login'));
 const Signup = lazy(() => import('./pages/Signup/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword/ForgotPassword'));
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
 
   // Check if we are on an auth page
-  const isAuthPage = ['/login', '/signup'].includes(location.pathname);
+  const isAuthPage = ['/login', '/signup', '/forgot-password'].includes(location.pathname);
 
   const handleMenuToggle = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -68,6 +69,7 @@ function AppContent() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </Suspense>
     );
