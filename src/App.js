@@ -1,21 +1,23 @@
-// App.js - Complete file with AUTO sidebar close on mobile navigation
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { SettingsProvider } from './context/SettingsContext.jsx';
 
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
-import Dashboard from './pages/Dashboard';
-import SendNotification from './pages/SendNotification/SendNotification';
-import History from './pages/History/History';
-import Analytics from './pages/Analytics/Analytics';
-import Settings from './pages/Settings/Settings';
-import Profile from './pages/Profile/Profile';
+import Loading from './components/common/Loading';
 
 import './App.css';
 import './theme-override.css';
-import Login from './pages/Login/Login';
-import Signup from './pages/Signup/Signup';
+
+// Lazy load pages for performance optimization
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const SendNotification = lazy(() => import('./pages/SendNotification/SendNotification'));
+const History = lazy(() => import('./pages/History/History'));
+const Analytics = lazy(() => import('./pages/Analytics/Analytics'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
+const Login = lazy(() => import('./pages/Login/Login'));
+const Signup = lazy(() => import('./pages/Signup/Signup'));
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -62,10 +64,12 @@ function AppContent() {
   // If we are on an auth page, render just the routes without the dashboard layout
   if (isAuthPage) {
     return (
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
+      <Suspense fallback={<Loading fullScreen />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </Suspense>
     );
   }
 
@@ -86,16 +90,18 @@ function AppContent() {
 
         {/* Page content */}
         <div className="page-content">
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/send" element={<SendNotification />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/profile" element={<Profile />} />
-            {/* Redirect legacy or unknown routes if needed, or keeping them separate */}
-          </Routes>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/send" element={<SendNotification />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
+              {/* Redirect legacy or unknown routes if needed, or keeping them separate */}
+            </Routes>
+          </Suspense>
         </div>
       </div>
     </div>
