@@ -38,7 +38,7 @@ const Signup = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
             console.log('Signup Success:', userCredential.user);
             // Optionally update profile with name here using updateProfile
-            navigate('/');
+            navigate('/dashboard');
         } catch (err) {
             console.error('Signup Error:', err);
             setError(err.message.replace('Firebase: ', ''));

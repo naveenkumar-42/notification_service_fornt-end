@@ -1,6 +1,6 @@
 // App.js - Complete file with AUTO sidebar close on mobile navigation
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { SettingsProvider } from './context/SettingsContext.jsx';
 
 import Sidebar from './components/Sidebar/Sidebar';
@@ -85,7 +85,8 @@ function AppContent() {
         {/* Page content */}
         <div className="page-content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/send" element={<SendNotification />} />
             <Route path="/history" element={<History />} />
             <Route path="/analytics" element={<Analytics />} />

@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Send, Clock, BarChart3, Settings, Menu } from 'lucide-react';
+import { Home, Send, Clock, BarChart3, Settings } from 'lucide-react';
 import './Sidebar.css';
 
 function Sidebar({ isOpen }) {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/', icon: Home, label: 'Dashboard' },
+    { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/send', icon: Send, label: 'Send Notification' },
     { path: '/history', icon: Clock, label: 'History' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },

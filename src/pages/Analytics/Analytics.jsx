@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   BarChart,
   Bar,
@@ -25,11 +25,7 @@ function Analytics() {
     retryAnalysis: []
   });
 
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, []);
-
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
       const response = await notificationAPI.getHistory();
       const data = response.data || [];
@@ -40,9 +36,30 @@ function Analytics() {
       setNotifications([]);
       processAnalytics([]);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData]);
 
   const processAnalytics = (data) => {
+    // If no data, set default zero values
+    if (!data || data.length === 0) {
+      setChartData({
+        statusDistribution: [{ name: 'No Data', value: 0 }],
+        priorityDistribution: [{ name: 'No Data', value: 0 }],
+        channelDistribution: [{ name: 'No Data', value: 0 }],
+        dailyTrend: [],
+        retryAnalysis: [
+          { name: '0 Retries', value: 0 },
+          { name: '1-2 Retries', value: 0 },
+          { name: '3-5 Retries', value: 0 },
+          { name: '5+ Retries', value: 0 }
+        ]
+      });
+      return;
+    }
+
     // Status Distribution
     const statusCount = data.reduce((acc, n) => {
       const existing = acc.find((s) => s.name === n.status);
@@ -154,17 +171,17 @@ function Analytics() {
     successRate:
       notifications.length > 0
         ? (
-            (notifications.filter((n) => n.status === 'SENT').length /
-              notifications.length) *
-            100
-          ).toFixed(2)
+          (notifications.filter((n) => n.status === 'SENT').length /
+            notifications.length) *
+          100
+        ).toFixed(2)
         : 0,
     avgRetries:
       notifications.length > 0
         ? (
-            notifications.reduce((sum, n) => sum + (n.retryCount || 0), 0) /
-            notifications.length
-          ).toFixed(2)
+          notifications.reduce((sum, n) => sum + (n.retryCount || 0), 0) /
+          notifications.length
+        ).toFixed(2)
         : 0
   };
 

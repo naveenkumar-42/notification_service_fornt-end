@@ -19,7 +19,7 @@ const Login = () => {
             setLoading(true);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log('Login Success:', userCredential.user);
-            navigate('/');
+            navigate('/dashboard');
         } catch (err) {
             console.error('Login Error:', err);
             setError("Invalid email or password.");
@@ -32,7 +32,7 @@ const Login = () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             console.log('Google Login Success:', result.user);
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             console.error('Google Login Error:', error);
             setError(`Google Sign-in failed: ${error.message}`);
