@@ -53,7 +53,8 @@
     }
 }
 
-[data-color-scheme="dark"] {
+[data-color-scheme="dark"],
+:root:not([data-color-scheme="light"]) {
     --color-background: #0f172a !important;
     --color-surface: #1e293b !important;
     --color-text: #f1f5f9 !important;

@@ -29,13 +29,15 @@
 }
 
 .sidebar-header {
-  padding: var(--space-24);
+  padding: var(--space-16) var(--space-24);
   border-bottom: 1px solid var(--color-border);
+  height: 72px;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-12);
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
@@ -76,7 +78,7 @@
   align-items: center;
   gap: var(--space-12);
   padding: var(--space-12) var(--space-16);
-  border-radius: var(--radius-base);
+  border-radius: 12px;
   color: var(--color-text-secondary);
   text-decoration: none;
   transition: all var(--duration-fast) var(--ease-standard);
