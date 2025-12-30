@@ -17,6 +17,13 @@ const Login = () => {
 
         try {
             setLoading(true);
+
+            // Execute reCAPTCHA
+            if (window.grecaptcha) {
+                const token = await window.grecaptcha.enterprise.execute('6LfMrzosAAAAAB45JSSZy6fyaYXDOzq1_LSC0xmu', { action: 'LOGIN' });
+                console.log('reCAPTCHA Token:', token);
+            }
+
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log('Login Success:', userCredential.user);
             navigate('/dashboard');

@@ -47,7 +47,7 @@ function Dashboard() {
         return dateB - dateA; // Descending order (newest first)
       });
 
-      setRecentNotifications(sortedNotifications.slice(0, 4));
+      setRecentNotifications(sortedNotifications.slice(0, 3));
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);

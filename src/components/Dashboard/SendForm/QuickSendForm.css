@@ -47,6 +47,8 @@
 
 .quick-form .btn {
   margin-top: var(--space-8);
+  width: 50%;
+  align-self: center;
 }
 
 @media (max-width: 480px) {
