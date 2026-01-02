@@ -59,7 +59,7 @@ api.interceptors.response.use(
           console.error('Not Found: The requested resource was not found');
           break;
         case 500:
-          console.error('Server Error: Internal server error occurred');
+          console.error('Server Error (Detailed):', data);
           break;
         default:
           console.error(`Error ${status}:`, data.message || 'An error occurred');

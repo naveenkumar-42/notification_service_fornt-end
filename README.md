@@ -1,70 +1,106 @@
-# Getting Started with Create React App
+# Notification Service Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive React-based admin dashboard for managing and monitoring a multi-channel notification service. This application allows users to send notifications (Email, SMS, Push), track their delivery status, view real-time analytics, and manage notification rules.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+- **Dashboard Overview**: Real-time summary of notification statistics (Total, Sent, Failed, Pending).
+- **Send Notifications**: Interface to manually trigger notifications via Email, SMS, or Push channels.
+- **Notification History**: Detailed logs of all notification events with filtering and status tracking.
+- **Analytics**: Visualizations using Recharts to track delivery rates, channel usage, and failure trends.
+- **Rule Management**: Configure priority, retry limits, and active status for different notification types.
+- **Authentication**: secure Login, Signup, and Password Recovery pages.
+- **Responsive Design**: customized UI with dark/light mode support (implied by theme structure) and mobile-responsive sidebar.
 
-### `npm start`
+## 🛠️ Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend Framework**: [React 19](https://react.dev/)
+- **Routing**: [React Router v6](https://reactrouter.com/)
+- **State Management**: React Context API (`SettingsContext`)
+- **Data Visualization**: [Recharts](https://recharts.org/)
+- **Styling**: CSS Modules, Lucide React (Icons)
+- **HTTP Client**: Axios
+- **Backend Services**: Firebase (Integration present)
+- **Build Tool**: Create React App (Scripts)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📂 Project Structure
 
-### `npm test`
+```bash
+notification_front-end/
+├── public/                 # Static assets
+├── src/
+│   ├── components/         # Reusable UI components (Cards, Sidebar, Header)
+│   ├── context/            # Global state (SettingsContext)
+│   ├── firebase/           # Firebase configuration
+│   ├── pages/              # Main Application Views
+│   │   ├── Dashboard/      
+│   │   ├── SendNotification/
+│   │   ├── History/        
+│   │   ├── Analytics/      
+│   │   ├── Settings/       
+│   │   └── Auth/           # Login, Signup, ForgotPassword
+│   ├── utils/              # Helper functions
+│   ├── App.js              # Main routing and layout logic
+│   └── index.js            # Entry point
+├── notification_db.sql     # Database schema and seed data
+└── package.json            # Project dependencies and scripts
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 💾 Database Schema
 
-### `npm run build`
+The project includes a `notification_db.sql` file defining the MySQL/MariaDB schema:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **`notification_event`**: Stores individual notification records (channel, recipient, status, retry_count).
+- **`notification_rule`**: Defines configuration for notification types (priority, max retries).
+- **`audit_log`**: Tracks system actions and state changes for auditing.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ⚙️ Installation & Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js (v18 or higher recommended)
+- npm or yarn
+- MySQL Server (for the backend database)
 
-### `npm run eject`
+### Steps
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1.  **Clone the Repository**
+    ```bash
+    git clone <repository-url>
+    cd notification_front-end
+    ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3.  **Database Setup**
+    - Import the `notification_db.sql` file into your MySQL server to create the `notification_db` database and tables.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4.  **Configure Environment**
+    - Create a `.env` file for your API variables if needed (e.g., `REACT_APP_API_BASE_URL`).
+    - The `package.json` currently proxies requests to `http://localhost:8080`. Ensure your backend service is running on this port.
 
-## Learn More
+5.  **Run the Application**
+    ```bash
+    npm start
+    ```
+    The app will launch in development mode at `http://localhost:3000`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📜 Scripts
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `npm start`: Runs the app in development mode.
+- `npm run build`: Builds the app for production to the `build` folder.
+- `npm test`: Launches the test runner.
 
-### Code Splitting
+## 🤝 Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-### Analyzing the Bundle Size
+## 📄 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License.
