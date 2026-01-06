@@ -39,6 +39,7 @@ function RecentNotifications({ notifications, loading }) {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
+      case 'CRITICAL': return 'danger';
       case 'HIGH': return 'danger';
       case 'MEDIUM': return 'warning';
       case 'LOW': return 'success';
