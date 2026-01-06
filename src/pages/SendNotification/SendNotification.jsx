@@ -290,14 +290,10 @@ function SendNotification() {
                   type="button"
                   className={`toggle-option ${formData.scheduledTime ? 'active' : ''}`}
                   onClick={() => {
-                    // Set a default future time if none exists, e.g., 1 hour from now
-                    if (!formData.scheduledTime) {
-                      const now = new Date();
-                      now.setHours(now.getHours() + 1);
-                      // Format to YYYY-MM-DDTHH:mm for datetime-local
-                      const defaultTime = now.toISOString().slice(0, 16);
-                      setFormData(prev => ({ ...prev, scheduledTime: defaultTime }));
-                    }
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() + 5);  // 5 min default
+                    const defaultTime = now.toISOString().slice(0, 16);
+                    setFormData(prev => ({ ...prev, scheduledTime: defaultTime }));
                   }}
                 >
                   <div className="toggle-icon">
