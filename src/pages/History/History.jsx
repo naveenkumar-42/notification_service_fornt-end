@@ -44,7 +44,15 @@ function History() {
       };
 
       const response = await notificationAPI.getFilteredHistory(params);
-      setNotifications(response.data || []);
+      const data = response.data || [];
+      // Sort by ID descending
+      const sortedData = data.sort((a, b) => {
+        if (typeof a.id === 'number' && typeof b.id === 'number') {
+          return b.id - a.id;
+        }
+        return String(b.id).localeCompare(String(a.id));
+      });
+      setNotifications(sortedData);
 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);

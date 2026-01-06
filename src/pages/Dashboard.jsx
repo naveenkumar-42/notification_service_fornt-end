@@ -40,11 +40,12 @@ function Dashboard() {
         failed: notifications.filter(n => n.status === 'FAILED').length
       });
 
-      // Sort by createdAt in descending order (newest first) and take first 5
+      // Sort by ID descending (newest first)
       const sortedNotifications = [...notifications].sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0);
-        const dateB = new Date(b.createdAt || 0);
-        return dateB - dateA; // Descending order (newest first)
+        if (typeof a.id === 'number' && typeof b.id === 'number') {
+          return b.id - a.id;
+        }
+        return String(b.id).localeCompare(String(a.id));
       });
 
       setRecentNotifications(sortedNotifications.slice(0, 3));
