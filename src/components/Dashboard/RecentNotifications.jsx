@@ -72,7 +72,7 @@ function RecentNotifications({ notifications, loading }) {
           <div className="notif-header">
             <span className="notif-id">#{notif.id}</span>
             <span className={`badge badge-${getStatusColor(notif.status)}`}>
-              {notif.status}
+              {notif.status === 'SENT' ? 'Delivered' : notif.status === 'PENDING' ? 'Queued' : notif.status}
             </span>
           </div>
           <p className="notif-message">{notif.message?.substring(0, 60)}...</p>

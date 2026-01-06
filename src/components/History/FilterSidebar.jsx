@@ -5,14 +5,14 @@ import './FilterSidebar.css';
 function FilterSidebar({ filters, onFilterChange, notificationCount }) {
   const statusOptions = [
     { value: 'ALL', label: 'All Status', color: 'primary' },
-    { value: 'SENT', label: 'Sent', color: 'success' },
-    { value: 'PENDING', label: 'Pending', color: 'warning' },
+    { value: 'DELIVERED_GROUP', label: 'Delivered', color: 'success' },
+    { value: 'QUEUED_GROUP', label: 'Queued', color: 'warning' },
     { value: 'FAILED', label: 'Failed', color: 'danger' }
   ];
 
   const priorityOptions = [
     { value: 'ALL', label: 'All Priorities' },
-    { value:'CRITICAL', label:'Critical', color:'danger'},
+    { value: 'CRITICAL', label: 'Critical', color: 'danger' },
     { value: 'HIGH', label: 'High', color: 'danger' },
     { value: 'MEDIUM', label: 'Medium', color: 'warning' },
     { value: 'LOW', label: 'Low', color: 'success' },

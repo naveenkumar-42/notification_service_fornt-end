@@ -162,7 +162,7 @@ function NotificationDropdown() {
                             <div className="notification-empty">
                                 <CheckCircle size={48} />
                                 <h4>All clear!</h4>
-                                <p>No pending or failed notifications</p>
+                                <p>No queued or failed notifications</p>
                             </div>
                         ) : (
                             <div className="notification-list">
@@ -188,7 +188,7 @@ function NotificationDropdown() {
                                             </div>
                                             <div className="notification-item-meta">
                                                 <span className={`nd-status-badge ${getStatusColor(notification.status)}`}>
-                                                    {notification.status}
+                                                    {notification.status === 'SENT' ? 'Delivered' : notification.status === 'PENDING' ? 'Queued' : notification.status}
                                                 </span>
                                                 {notification.retryCount > 0 && (
                                                     <span className="nd-retry-badge">

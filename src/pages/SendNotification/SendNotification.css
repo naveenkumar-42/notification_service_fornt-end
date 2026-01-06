@@ -854,3 +854,38 @@ textarea.form-control {
   text-align: center;
   margin-top: 0;
 }
+/* Popup Alert Styling */
+.alert.popup-alert {
+  position: fixed;
+  top: 90px;
+  left: 24px;
+  width: auto;
+  max-width: 400px;
+  z-index: 1000;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  animation: slideInLeft 0.3s ease-out;
+  border-left: 4px solid;
+  background-color: var(--color-surface, #1e293b); 
+  border: 1px solid var(--color-border, #334155);
+  padding: 16px; 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text, #f8fafc);
+  border-radius: 8px;
+}
+
+.alert.popup-alert.alert-error {
+  border-left-color: var(--color-error, #ef4444);
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

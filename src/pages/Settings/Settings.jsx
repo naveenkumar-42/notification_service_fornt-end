@@ -458,23 +458,25 @@ function Settings() {
         </div>
       </div>
 
-      {/* Fixed Save Bar */}
-      <div className="settings-save-bar">
-        <div className="save-bar-content">
-          <div className="save-info">
-            <CheckCircle size={18} />
-            <span>All changes are auto-saved</span>
+      {/* Fixed Save Bar - Hide on About page */}
+      {activeSection !== 'about' && (
+        <div className="settings-save-bar">
+          <div className="save-bar-content">
+            <div className="save-info">
+              <CheckCircle size={18} />
+              <span>All changes are auto-saved</span>
+            </div>
+            <button
+              className="btn-save"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              <Save size={18} />
+              {saving ? 'Saving...' : 'Save Settings'}
+            </button>
           </div>
-          <button
-            className="btn-save"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            <Save size={18} />
-            {saving ? 'Saving...' : 'Save Settings'}
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

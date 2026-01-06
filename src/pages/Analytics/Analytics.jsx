@@ -62,9 +62,14 @@ function Analytics() {
 
     // Status Distribution
     const statusCount = data.reduce((acc, n) => {
-      const existing = acc.find((s) => s.name === n.status);
+      let statusName = n.status || 'UNKNOWN';
+      if (statusName === 'SENT' || statusName === 'DELIVERED') statusName = 'Delivered';
+      if (statusName === 'PENDING' || statusName === 'QUEUED') statusName = 'Queued';
+      if (statusName === 'DEAD_LETTERED') statusName = 'FAILED';
+
+      const existing = acc.find((s) => s.name === statusName);
       if (existing) existing.value++;
-      else acc.push({ name: n.status || 'UNKNOWN', value: 1 });
+      else acc.push({ name: statusName, value: 1 });
       return acc;
     }, []);
 
@@ -90,10 +95,10 @@ function Analytics() {
     const dailyData = {};
     data.forEach((n) => {
       const date = new Date(n.createdAt).toLocaleDateString();
-      if (!dailyData[date]) dailyData[date] = { date, count: 0, sent: 0, failed: 0 };
+      if (!dailyData[date]) dailyData[date] = { date, count: 0, delivered: 0, failed: 0 };
       dailyData[date].count++;
-      if (n.status === 'SENT') dailyData[date].sent++;
-      if (n.status === 'FAILED') dailyData[date].failed++;
+      if (n.status === 'SENT' || n.status === 'DELIVERED') dailyData[date].delivered++;
+      if (n.status === 'FAILED' || n.status === 'DEAD_LETTERED') dailyData[date].failed++;
     });
 
     const dailyTrend = Object.values(dailyData)
@@ -140,9 +145,12 @@ function Analytics() {
   };
 
   const STATUS_COLORS = {
-    SENT: COLORS.medium,
+    Delivered: COLORS.medium, // Was SENT
     DELIVERED: COLORS.low,
     FAILED: COLORS.critical,
+    DEAD_LETTERED: COLORS.critical,
+    RETRY: COLORS.high,
+    Queued: COLORS.high, // Was PENDING
     PENDING: COLORS.high,
     QUEUED: COLORS.medium,
     DEFAULT: COLORS.unknown
@@ -166,12 +174,12 @@ function Analytics() {
   };
 
   const stats = {
-    totalSent: notifications.filter((n) => n.status === 'SENT').length,
+    totalSent: notifications.filter((n) => n.status === 'SENT' || n.status === 'DELIVERED').length,
     totalFailed: notifications.filter((n) => n.status === 'FAILED').length,
     successRate:
       notifications.length > 0
         ? (
-          (notifications.filter((n) => n.status === 'SENT').length /
+          (notifications.filter((n) => n.status === 'SENT' || n.status === 'DELIVERED').length /
             notifications.length) *
           100
         ).toFixed(2)
@@ -194,7 +202,7 @@ function Analytics() {
 
       <div className="grid-4 mb-6">
         <div className="stat-card">
-          <div className="stat-label">Total Sent</div>
+          <div className="stat-label">Total Delivered</div>
           <div className="stat-value">{stats.totalSent}</div>
           <div className="stat-change positive">Success</div>
         </div>
@@ -273,34 +281,34 @@ function Analytics() {
         </div>
       </div>
 
-      <div className="grid-2 mb-6">
-        <div className="chart-card">
-          <h3>Daily Trend (Last 7 Days)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData.dailyTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar
-                dataKey="sent"
-                fill={COLORS.low}
-                name="Sent"
-                radius={[4, 4, 0, 0]}
-                isAnimationActive={true}
-              />
-              <Bar
-                dataKey="failed"
-                fill={COLORS.critical}
-                name="Failed"
-                radius={[4, 4, 0, 0]}
-                isAnimationActive={true}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="chart-card mb-6">
+        <h3>Daily Trend (Last 7 Days)</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData.dailyTrend}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar
+              dataKey="delivered"
+              fill={COLORS.low}
+              name="Delivered"
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={true}
+            />
+            <Bar
+              dataKey="failed"
+              fill={COLORS.critical}
+              name="Failed"
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={true}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
+      <div className="grid-2 mb-6">
         <div className="chart-card">
           <h3>Retry Analysis</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -311,37 +319,54 @@ function Analytics() {
               <Tooltip />
               <Bar
                 dataKey="value"
-                fill={COLORS.medium}
                 name="Count"
+                fill={COLORS.medium}
                 radius={[4, 4, 0, 0]}
                 isAnimationActive={true}
-              />
+              >
+                {chartData.retryAnalysis.map((entry, index) => (
+                  <Cell
+                    key={`RETRY-${index}`}
+                    fill={
+                      index === 0 ? COLORS.low :
+                        index === 1 ? COLORS.medium :
+                          index === 2 ? COLORS.high :
+                            COLORS.critical
+                    }
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
 
-      <div className="chart-card">
-        <h3>Channel Distribution</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData.channelDistribution}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]} isAnimationActive={true}>
-              {chartData.channelDistribution.map((entry, index) => (
-                <Cell
-                  key={`channel-${index}`}
-                  fill={
-                    CHANNEL_COLORS[entry.name] || CHANNEL_COLORS.UNKNOWN
-                  }
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="chart-card">
+          <h3>Channel Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={chartData.channelDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+                isAnimationActive={true}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              >
+                {chartData.channelDistribution.map((entry, index) => (
+                  <Cell
+                    key={`channel-${index}`}
+                    fill={CHANNEL_COLORS[entry.name] || CHANNEL_COLORS.UNKNOWN}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

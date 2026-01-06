@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Send, Clock, BarChart3, Settings } from 'lucide-react';
+import { Home, Send, Clock, BarChart3, Settings, MessageSquare } from 'lucide-react';
 import './Sidebar.css';
 
 function Sidebar({ isOpen }) {
@@ -12,7 +12,8 @@ function Sidebar({ isOpen }) {
     { path: '/send', icon: Send, label: 'Send Notification' },
     { path: '/history', icon: Clock, label: 'History' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
-    { path: '/settings', icon: Settings, label: 'Settings' }
+    { path: '/settings', icon: Settings, label: 'Settings' },
+    { path: '/contact', icon: MessageSquare, label: 'Contact' }
   ];
 
   const isActive = (path) => location.pathname === path;

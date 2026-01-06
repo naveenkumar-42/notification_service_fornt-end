@@ -1,19 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
-import { BarChart, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { BarChart, TrendingUp, AlertCircle, CheckCircle, Lock } from 'lucide-react';
 import { notificationAPI } from '../utils/api';
 import StatsCard from '../components/Cards/StatsCard';
 import RecentNotifications from '../components/Dashboard/RecentNotifications';
 import QuickSendForm from '../components/Dashboard/SendForm/QuickSendForm';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 function Dashboard() {
   const { settings } = useSettings();
+  const { canSend } = useAuth();
   const [stats, setStats] = useState({
     total: 0,
-    sent: 0,
-    pending: 0,
+    delivered: 0,
+    queued: 0,
     failed: 0
   });
   const [recentNotifications, setRecentNotifications] = useState([]);
@@ -35,8 +37,8 @@ function Dashboard() {
 
       setStats({
         total: notifications.length,
-        sent: notifications.filter(n => n.status === 'SENT').length,
-        pending: notifications.filter(n => n.status === 'PENDING').length,
+        delivered: notifications.filter(n => n.status === 'SENT' || n.status === 'DELIVERED').length,
+        queued: notifications.filter(n => n.status === 'PENDING' || n.status === 'QUEUED').length,
         failed: notifications.filter(n => n.status === 'FAILED').length
       });
 
@@ -112,14 +114,14 @@ function Dashboard() {
             color="primary"
           />
           <StatsCard
-            title="Sent"
-            value={stats.sent}
+            title="Delivered"
+            value={stats.delivered}
             icon={CheckCircle}
             color="success"
           />
           <StatsCard
-            title="Pending"
-            value={stats.pending}
+            title="Queued"
+            value={stats.queued}
             icon={TrendingUp}
             color="warning"
           />
@@ -135,10 +137,17 @@ function Dashboard() {
       <div className="grid-2">
         <div className="card">
           <div className="card-header">
-            <h2>Quick Send</h2>
+            <div className="flex items-center gap-2">
+              <h2>Quick Send</h2>
+              {/* {!canSend && (
+                <span className="text-xs text-red-500 flex items-center gap-1" style={{ fontSize: '0.8rem', color: '#ff1744', marginLeft: 'auto' }}>
+                  <Lock size={14} /> Read Only
+                </span>
+              )} */}
+            </div>
           </div>
           <div className="card-body">
-            <QuickSendForm onSubmit={handleQuickSend} />
+            <QuickSendForm onSubmit={handleQuickSend} isReadOnly={!canSend} />
           </div>
         </div>
 

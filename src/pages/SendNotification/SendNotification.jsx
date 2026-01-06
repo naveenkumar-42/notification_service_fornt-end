@@ -15,10 +15,12 @@ import {
 } from "lucide-react";
 import { notificationAPI } from "../../utils/api";
 import { useSettings } from "../../context/SettingsContext";
+import { useAuth } from "../../context/AuthContext";
 import "./SendNotification.css";
 
 function SendNotification() {
   const { settings } = useSettings();
+  const { canSend } = useAuth();
   const [formData, setFormData] = useState({
     notificationType: "USER_SIGNUP",
     recipient: "",
@@ -78,6 +80,15 @@ function SendNotification() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!canSend) {
+      setAlert({
+        type: "error",
+        message: "Action Denied: You do not have permission to send notifications.",
+        isPopup: true
+      });
+      return;
+    }
 
     if (!formData.recipient || !formData.message) {
       setAlert({
@@ -146,7 +157,7 @@ function SendNotification() {
       </div>
 
       {alert && (
-        <div className={`alert alert-${alert.type}`}>
+        <div className={`alert alert-${alert.type} ${alert.isPopup ? 'popup-alert' : ''}`}>
           <div className="alert-content">
             {alert.type === "success" ? (
               <CheckCircle2 size={20} />
@@ -371,7 +382,7 @@ function SendNotification() {
                   {formData.channel === 'EMAIL' ? (
                     <div className="preview-email-dark-wrapper">
                       <div className="preview-brand-header">
-                        <h2><span className="preview-brand-accent">Your</span> Brand</h2>
+                        <h2><span className="preview-brand-accent">Nk's</span> Notification</h2>
                       </div>
                       <div className="preview-email-card">
                         <div className="preview-gradient-strip"></div>

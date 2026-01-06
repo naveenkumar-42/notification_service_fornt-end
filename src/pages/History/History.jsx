@@ -36,8 +36,13 @@ function History() {
       }
 
       // Build backend filter params
+      // If filtering by a group (like DELIVERED_GROUP), we need to fetch ALL and filter locally
+      // because the backend might not support OR queries.
+      const isGroupFilter = filters.status === 'DELIVERED_GROUP' || filters.status === 'QUEUED_GROUP';
+      const backendStatus = (filters.status === 'ALL' || isGroupFilter) ? null : filters.status;
+
       const params = {
-        status: filters.status === 'ALL' ? null : filters.status,
+        status: backendStatus,
         priority: filters.priority === 'ALL' ? null : filters.priority,
         channel: filters.channel === 'ALL' ? null : filters.channel,
         dateRange: filters.dateRange === 'all' ? null : filters.dateRange
@@ -52,7 +57,15 @@ function History() {
         }
         return String(b.id).localeCompare(String(a.id));
       });
-      setNotifications(sortedData);
+      // Apply local filtering for groups if needed
+      let finalData = sortedData;
+      if (filters.status === 'DELIVERED_GROUP') {
+        finalData = sortedData.filter(n => n.status === 'SENT' || n.status === 'DELIVERED');
+      } else if (filters.status === 'QUEUED_GROUP') {
+        finalData = sortedData.filter(n => n.status === 'PENDING' || n.status === 'QUEUED');
+      }
+
+      setNotifications(finalData);
 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);

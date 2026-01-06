@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import './QuickSendForm.css';
 
-function QuickSendForm({ onSubmit }) {
+function QuickSendForm({ onSubmit, isReadOnly }) {
   const [formData, setFormData] = useState({
     notificationType: 'ALERT',
     recipient: '',
@@ -12,7 +12,7 @@ function QuickSendForm({ onSubmit }) {
     priority: 'MEDIUM'
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [alert, setAlert] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,32 +20,45 @@ function QuickSendForm({ onSubmit }) {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
-    if (error) setError(null);
+    // Clear alert when user starts typing
+    if (alert) setAlert(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    
-    if (!formData.recipient || !formData.message) {
-      setError('Please fill in all required fields');
+    setAlert(null);
+
+    if (isReadOnly) {
+      setAlert({
+        type: 'error',
+        message: "Action Denied: You do not have permission to send notifications.",
+        isPopup: true
+      });
+      // Clear popup after 3 seconds
+      setTimeout(() => setAlert(null), 3000);
       return;
     }
-    
+
+    if (!formData.recipient || !formData.message) {
+      setAlert({ type: 'error', message: 'Please fill in all required fields' });
+      return;
+    }
+
     setLoading(true);
     try {
       await onSubmit(formData);
-      // Reset form only on success
-      setFormData({ 
+      // Reset form on success
+      setFormData({
         notificationType: 'ALERT',
-        recipient: '', 
-        message: '', 
+        recipient: '',
+        message: '',
         channel: 'EMAIL',
         priority: 'MEDIUM'
       });
+      setAlert({ type: 'success', message: 'Notification sent successfully!' });
+      setTimeout(() => setAlert(null), 3000);
     } catch (err) {
-      setError(err.message || 'Failed to send notification');
+      setAlert({ type: 'error', message: err.message || 'Failed to send notification' });
     } finally {
       setLoading(false);
     }
@@ -53,9 +66,9 @@ function QuickSendForm({ onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} className="quick-form">
-      {error && (
-        <div className="alert alert-error" style={{ marginBottom: '16px', padding: '12px' }}>
-          {error}
+      {alert && (
+        <div className={`alert alert-${alert.type} ${alert.isPopup ? 'popup-alert' : ''}`}>
+          {alert.message}
         </div>
       )}
 
@@ -74,20 +87,19 @@ function QuickSendForm({ onSubmit }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="channel">Channel *</label>
-        <select
-          id="channel"
-          name="channel"
-          value={formData.channel}
-          onChange={handleChange}
-          className="form-control"
-          required
-        >
-          <option value="EMAIL">Email</option>
-          <option value="SMS">SMS</option>
-          <option value="PUSH">Push</option>
-          <option value="IN_APP">In-App</option>
-        </select>
+        <label>Channel *</label>
+        <div className="channel-group">
+          {['EMAIL', 'SMS', 'PUSH', 'IN_APP'].map(ch => (
+            <button
+              key={ch}
+              type="button"
+              className={`channel-btn ${formData.channel === ch ? 'active' : ''}`}
+              onClick={() => handleChange({ target: { name: 'channel', value: ch } })}
+            >
+              {ch === 'IN_APP' ? 'In-App' : ch.charAt(0) + ch.slice(1).toLowerCase()}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* <div className="form-group">
@@ -121,8 +133,8 @@ function QuickSendForm({ onSubmit }) {
         />
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className="btn btn-primary"
         disabled={loading}
       >

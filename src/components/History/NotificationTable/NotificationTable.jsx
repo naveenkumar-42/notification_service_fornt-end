@@ -135,7 +135,11 @@ function NotificationTable({
                   <div className="status-icon">
                     {getStatusIcon(notif.status)}
                   </div>
-                  <span>{notif.status || 'UNKNOWN'}</span>
+                  <span>
+                    {(notif.status === 'SENT' || notif.status === 'DELIVERED') ? 'Delivered' :
+                      (notif.status === 'PENDING' || notif.status === 'QUEUED') ? 'Queued' :
+                        notif.status || 'UNKNOWN'}
+                  </span>
                 </div>
               </td>
 

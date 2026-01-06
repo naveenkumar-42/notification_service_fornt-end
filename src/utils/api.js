@@ -3,8 +3,8 @@ import { auth } from '../firebase/config';
 
 // Use proxy in development, absolute URL in production
 const API_BASE_URL = 
-`https://notification-service-vqye.onrender.com/api/notifications`;
-// `http://localhost:8080/api/notifications` ;
+// `https://notification-service-vqye.onrender.com/api/notifications`;
+`http://localhost:8080/api/notifications` ;
 // Create axios instance with default configuration
 const api = axios.create({
   baseURL: API_BASE_URL,

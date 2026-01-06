@@ -18,7 +18,7 @@ export const SettingsProvider = ({ children }) => {
         maxRetries: 3,
         enableNotifications: true,
         enableAnalytics: true,
-        theme: 'light',
+        theme: 'dark',
         dateFormat: 'local', // 'local', 'utc', 'relative'
         emailSignature: '',
         density: 'comfortable' // 'comfortable', 'compact'

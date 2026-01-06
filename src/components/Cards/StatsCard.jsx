@@ -9,7 +9,7 @@ function StatsCard({ title, value, icon: Icon, color }) {
       </div>
       <div className="stats-content">
         <p className="stats-label">{title}</p>
-        <p className="stats-value">{value.toLocaleString()}</p>
+        <p className="stats-value">{(value || 0).toLocaleString()}</p>
       </div>
       <div className="stats-bg-icon">
         {Icon && <Icon size={80} />}

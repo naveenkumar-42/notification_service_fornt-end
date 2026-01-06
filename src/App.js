@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { SettingsProvider } from './context/SettingsContext.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
@@ -16,6 +17,7 @@ const History = lazy(() => import('./pages/History/History'));
 const Analytics = lazy(() => import('./pages/Analytics/Analytics'));
 const Settings = lazy(() => import('./pages/Settings/Settings'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
+const Contact = lazy(() => import('./pages/Contact/Contact'));
 const Login = lazy(() => import('./pages/Login/Login'));
 const Signup = lazy(() => import('./pages/Signup/Signup'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword/ForgotPassword'));
@@ -100,6 +102,7 @@ function AppContent() {
               <Route path="/history" element={<History />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/profile" element={<Profile />} />
               {/* Redirect legacy or unknown routes if needed, or keeping them separate */}
             </Routes>
@@ -114,7 +117,9 @@ function App() {
   return (
     <Router>
       <SettingsProvider>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </SettingsProvider>
     </Router>
   );
