@@ -74,42 +74,19 @@ function SendNotification() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.recipient || !formData.message) {
-      setAlert({
-        type: "warning",
-        message: "Please fill in all required fields (Recipient & Message).",
-      });
+      setAlert({ type: 'warning', message: 'Recipient & Message required' });
       return;
     }
-
     setLoading(true);
     try {
+      // RAW formData - controller handles everything!
       const response = await notificationAPI.sendNotification(formData);
-      setAlert({
-        type: "success",
-        message: `Notification queued successfully${response.data?.eventId ? ` (Event ID: ${response.data.eventId})` : ""
-          }`,
-      });
-      setFormData({
-        notificationType: "USER_SIGNUP",
-        recipient: "",
-        channel: settings.defaultChannel || "EMAIL",
-        priority: "MEDIUM",
-        message: settings.emailSignature ? `\n\n${settings.emailSignature}` : "",
-        subject: "",
-        scheduledTime: "",
-      });
-      setTimeout(() => setAlert(null), 4000);
+      setAlert({ type: 'success', message: `Queued! Event ID: ${response.data.eventId || 'N/A'}` });
+      setFormData({ notificationType: 'USERSIGNUP', recipient: '', channel: 'EMAIL', priority: 'MEDIUM', message: '', subject: '', scheduledTime: '' });
+      setTimeout(() => setAlert(null), 5000);
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to send notification. Please try again.";
-      setAlert({
-        type: "error",
-        message: errorMessage,
-      });
+      setAlert({ type: 'error', message: error.response?.data?.message || 'Failed to send' });
     } finally {
       setLoading(false);
     }
