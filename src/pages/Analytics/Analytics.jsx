@@ -228,6 +228,7 @@ function Analytics() {
                 label={({ name, value }) => `${name}: ${value}`}
                 outerRadius={110}
                 dataKey="value"
+                isAnimationActive={true}
               >
                 {chartData.statusDistribution.map((entry, index) => (
                   <Cell
@@ -255,6 +256,7 @@ function Analytics() {
                 label={({ name, value }) => `${name}: ${value}`}
                 outerRadius={110}
                 dataKey="value"
+                isAnimationActive={true}
               >
                 {chartData.priorityDistribution.map((entry, index) => (
                   <Cell
@@ -286,12 +288,14 @@ function Analytics() {
                 fill={COLORS.low}
                 name="Sent"
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={true}
               />
               <Bar
                 dataKey="failed"
                 fill={COLORS.critical}
                 name="Failed"
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={true}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -310,6 +314,7 @@ function Analytics() {
                 fill={COLORS.medium}
                 name="Count"
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={true}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -325,7 +330,7 @@ function Analytics() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]} isAnimationActive={true}>
               {chartData.channelDistribution.map((entry, index) => (
                 <Cell
                   key={`channel-${index}`}

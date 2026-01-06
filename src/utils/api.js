@@ -2,9 +2,7 @@ import axios from 'axios';
 import { auth } from '../firebase/config';
 
 // Use proxy in development, absolute URL in production
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'http://localhost:8080/api/notifications'
-  : '/api/notifications';
+const API_BASE_URL = 'https://notification-service-vqye.onrender.com/api/notifications';
 
 // Create axios instance with default configuration
 const api = axios.create({
